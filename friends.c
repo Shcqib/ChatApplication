@@ -10,6 +10,7 @@ void removeFriend(void);
 void messageFriend(void);
 char friendList[MAX_FRIENDS][50];
 int numberOfFriends = 0;
+char message[MSG_LEN];
 
 void showFriendList(void);
 void addFriend(void);
@@ -49,29 +50,49 @@ int friends(void) {
 }
 
 void messageFriend(void) {
-	char message[100];
-	printf("Type the name of the friend you would like to message\n");
-	promptUserForInput("%s", nameOfFriend);
+	int lenOfMsg = 0;
+
+	while (1) {
+		printf("Type the name of the friend you would like to message\n");
+		if (!isValidName(nameOfFriend)) {
+			printf("Invalid name, Please try again.\n");
+		} else {
+			break;
+		}
+	}
 	int found = 0;
 	for (int i = 0; i < numberOfFriends; i++) {
 		if (strcmp(nameOfFriend, friendList[i]) == 0) {
 			found = 1;
-			printf("Type your message\n");
-			promptUserForInput("%s", message);
+			while (1) {
+				printf("Type your message\n");
+				promptUserForString(message);
+				lenOfMsg = strlen(message);
+				printf("%d\n\n", lenOfMsg);
+				if (lenOfMsg >= MSG_LEN) {
+					printf("Message exceeded limit, Please try again\n\n");
+				} else {
+					break;	
+				}
+			}
 			printf("me -> %s) %s\n\n", nameOfFriend, message); 
 			return;
 		}
-		
-		if (!found) {
-			printf("You are not friends with that person.\n\n");
-		}	
-	}
+	}	
+	if (!found) {
+		printf("You are not friends with that person.\n\n");
+	}	
 }
 
 void removeFriend(void) {
-	printf("What friend would you like to remove?\n");
-	promptUserForInput("%49s", nameOfFriend);
-	if (isValidName(nameOfFriend)) {
+	while (1) {
+    	printf("What friend would you like to remove?\n");
+		if (!isValidName(nameOfFriend)) {
+            printf("Invalid name, Please try again.\n");
+        } else {
+           	break;
+        }
+    }
 		int found = 0;
 		for (int i = 0; i < numberOfFriends; i++) {
 			if (strcmp(nameOfFriend, friendList[i]) == 0) {
@@ -88,23 +109,24 @@ void removeFriend(void) {
            	printf("You are not friends with that person.\n\n");
         }	
 	}
-}
+
 
 void addFriend(void) {
 	if (numberOfFriends < MAX_FRIENDS) {
-		printf("What is the name of your friend?\n");
-    	promptUserForInput("%49s", nameOfFriend);
-		if (isValidName(nameOfFriend)) {
-   			strcpy(friendList[numberOfFriends], nameOfFriend);
-    		numberOfFriends++;
-        	printf("Friend added.\n\n");
-    	} else { 
+		while (1) {
+       		printf("What is the name of your friend?\n");
+			if (!isValidName(nameOfFriend)) {
+            	printf("Invalid name, Please try again.\n");
+        	} else {
+        	    break;
+        	}
+    	}
+  		strcpy(friendList[numberOfFriends], nameOfFriend);
+   		numberOfFriends++;
+       	printf("Friend added.\n\n");
+    } else { 
         	printf("Friend list is full.\n\n");
-    	}	
-	}
-	else {
-		printf("Invalid name.\n\n");
-	}
+   	}	
 }
 
 void showFriendList(void) {

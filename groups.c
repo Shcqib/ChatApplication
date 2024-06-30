@@ -96,8 +96,7 @@ int seeYourCurrentGroups(void) {
 void addGroup() {
 	if (numberOfGroups < MAX_GROUPS) {
 		char nameOfGroup[NAME_LEN];
-   		printf("What would you like to call your group?");
-    	promptUserForInput("%s", nameOfGroup);
+   		printf("What would you like to call your group?\n");
 		if (isValidName(nameOfGroup)) {
 			numOfMembers = ++groups[numberOfGroups].numberOfMembers;
    			strcpy(groups[numberOfGroups].groupName, nameOfGroup);
@@ -115,13 +114,16 @@ void addGroup() {
 
 void addToGroup(Group *currentGroup) {
 	if (currentGroup->numberOfMembers < MAX_MEMBERS) {
-    	printf("Type the name of the person you would like to add to the group.\n\n");
-        promptUserForInput("%s", nameOfFriend);
-        numOfMembers = ++currentGroup->numberOfMembers;
-        strcpy(currentGroup->members[numOfMembers - 1], nameOfFriend);
-        printf("Added %s to the group.\n\n", nameOfFriend);
-		groupMenu(currentGroup);
-    } else {
+    	printf("Type the name of the person you would like to add to the group.\n");
+		if (isValidName(nameOfFriend)) {
+	        numOfMembers = ++currentGroup->numberOfMembers;
+    	    strcpy(currentGroup->members[numOfMembers - 1], nameOfFriend);
+        	printf("Added %s to the group.\n\n", nameOfFriend);
+			groupMenu(currentGroup);
+    	} else {
+			printf("Invalid name.\n\n");
+		}
+	} else {
         printf("Group is full.\n\n");
 		return;
     }
@@ -142,34 +144,66 @@ void leaveGroup(Group *currentGroup) {
 	}		
 }
 
+int chatToGroup() {
+	while (1) {
+		printf("1) Message\n");
+		printf("2) Go Back\n");
+
+		promptUserForInput("%d", &choice);
+		switch (choice) {
+			case 1:
+				while (1) { 
+    				printf("Type your message\n");
+        			promptUserForString(message);
+        			if (strlen(message) >= MSG_LEN) {
+        				printf("Message exceeded limit\n\n");
+        			} else {
+            			break;
+        			}
+				}
+				printf("me -> %s\n", message);	
+				break;
+			case 2:
+				return 0;
+			default:
+				printf("Invalid input, please choose 1 or 2\n");
+				break;
+		}
+	}
+}		
+
 int groupMenu(Group *currentGroup) {
-	while (1) {	
-		printf("1) Add to the group\n");
-		printf("2) Leave the group\n");
-		printf("3) Kick from the group\n");
-	    printf("4) See group members\n");
-		printf("5) Go back\n");
+	while (1) {
+		printf("1) Chat to the group\n");	
+		printf("2) Add to the group\n");
+		printf("3) Leave the group\n");
+		printf("4) Kick from the group\n");
+	    printf("5) See group members\n");
+		printf("6) Go back\n");
 		promptUserForInput("%d", &choice);
 
 	 	switch (choice) {
        		case 1:
-         		addToGroup(currentGroup);
+				chatToGroup();
 				break;
 			case 2:
+         		addToGroup(currentGroup);
+				break;
+			case 3:
 				leaveGroup(currentGroup);
 				groupsMenu();
 				break;
-			case 3:
+			case 4:
 				kickFromGroup(currentGroup);
 				break;  
-         	case 4:
+         	case 5:
             	printf("Current group members\n\n");
 				for	(int i = 0; i < currentGroup->numberOfMembers; i++) {
 					printf("%d) %s\n", i + 1, currentGroup->members[i]);	
 				}
 				printf("\n");
             	break;
-			case 5:
+			case 6:
 				printf("Going back to group menu...\n\n");
 				groupsMenu();
          	default:

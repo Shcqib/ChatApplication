@@ -4,13 +4,21 @@
 #include "shqcuts.h"
 
 char myName[50];
+char Pass[50];
 
 int start(void);
 void registerUser(void);
 void login(void);
 int menu(void);
 
-int main(void) {	
+int main(void) {
+	addUsersFromFile();	
+	printf("number of users = %d\n\n", numberOfUsers);
+	for (int i = 0; i < numberOfUsers; i++) {
+		printf("User %d = %s\n", i, users[i].username);
+		printf("Pass %d = %s\n", i, users[i].password);
+		printf("\n"); 
+	}
 	start();
 	menu();
 	return 0;
@@ -18,25 +26,58 @@ int main(void) {
 
 void login(void) {
 	while (1) {
-		printf("What is your Username?\n");
-  		promptUserForString(myName);
-    	if (isValidName(myName)) { 
-       		printf("Welcome back %s\n\n", myName);
-			break;
-    	} else {
-    		printf("Invalid name, Please select another name.\n\n");
-    	}
-	}  
+        printf("Username\n");
+   
+        if (isValidName(myName)) {
+    		printf("Password\n");
+       	    if (isValidPass(Pass)) {
+				for (int i = 0; i < numberOfUsers; i++) { 
+              		if (strcmp(users[i].username, myName) == 0 && strcmp(users[i].password, myName) == 0) {
+	           			printf("Welcome back %s\n\n", myName);
+                    	return;	
+					} else {
+						printf("Invalid username or password\n\n");
+						break;
+					}
+          		}
+			} else {
+           		printf("Password cannot contain spaces, Please try again.\n\n");
+          	}
+       	} else {
+       		printf("Invalid name, Please select another name.\n\n");
+   		}
+	}
 }
 
 void registerUser(void) {
-	printf("Username?\n");
-    promptUserForInput("%s", myName);
-    if (isValidName(myName)) {
-        printf("Welcome %s\n\n", myName);
-    } else {
-        printf("Invalid name, Please select another name.\n\n");
-    }
+	while (1) {
+		printf("What would you like your username to be?\n");
+			
+    	if (isValidName(myName)) {
+			int isAvailable = 1;
+			for (int i = 0; i < numberOfUsers; i++) {
+            	if (strcmp(users[i].username, myName) == 0) {
+                	printf("myName is unavailable, Please select another name.\n\n");
+					isAvailable = 0;
+					break;
+        		}
+			}
+			if (isAvailable) {
+				while (1) {
+					printf("What would you like your password to be?\n");
+					if (isValidPass(Pass)) {
+        				printf("Welcome %s\n\n", myName);
+						writeUserToFile(myName, Pass);
+						return;
+   					} else {
+						printf("Password cannot contain spaces, Please try again.\n\n");
+					}
+				}
+			}
+		} else {
+        	printf("Invalid name, Please select another name.\n\n");
+    	}
+	}
 }
 
 int start(void) {
@@ -79,11 +120,11 @@ int menu(void) {
                 printf("Starting chat with a random...\n\n");
                 break;
             case 2:
-                printf("Showing friends list...\n\n");
+                printf("Showing friends menu...\n\n");
                 friends();
 				break;
 			case 3:
-				printf("Groups...\n\n");
+				printf("Showing groups menu...\n\n");
 				groupsMenu();
 				break;
             case 4:
