@@ -2,83 +2,40 @@
 #include <stdlib.h>
 #include <string.h>
 #include "shqcuts.h"
+#include <stdbool.h>
 
-char myName[50];
-char Pass[50];
+char myName[NAME_LEN];
+char myPass[NAME_LEN];
+bool active;
 
 int start(void);
 void registerUser(void);
 void login(void);
 int menu(void);
+void chatWithRandom();
 
 int main(void) {
-	addUsersFromFile();	
-	printf("number of users = %d\n\n", numberOfUsers);
+	updateUsersArray();	
+	updateFriendArray();
+	updateGroups();
+	updateFReq();
+	for (int i = 0; i < numberOfFriends; i++) {
+		printf("friend %d = %s", i + 1, friendList[i]);
+	}
+	printf("\nnumber of users = %d\n\n", numberOfUsers);
 	for (int i = 0; i < numberOfUsers; i++) {
 		printf("User %d = %s\n", i, users[i].username);
 		printf("Pass %d = %s\n", i, users[i].password);
+		printf("status %d = %s\n", i, users[i].status); 	
 		printf("\n"); 
 	}
 	start();
+	clientSocket();
 	menu();
 	return 0;
 }
 
-void login(void) {
-	while (1) {
-        printf("Username\n");
-   
-        if (isValidName(myName)) {
-    		printf("Password\n");
-       	    if (isValidPass(Pass)) {
-				for (int i = 0; i < numberOfUsers; i++) { 
-              		if (strcmp(users[i].username, myName) == 0 && strcmp(users[i].password, myName) == 0) {
-	           			printf("Welcome back %s\n\n", myName);
-                    	return;	
-					} else {
-						printf("Invalid username or password\n\n");
-						break;
-					}
-          		}
-			} else {
-           		printf("Password cannot contain spaces, Please try again.\n\n");
-          	}
-       	} else {
-       		printf("Invalid name, Please select another name.\n\n");
-   		}
-	}
-}
 
-void registerUser(void) {
-	while (1) {
-		printf("What would you like your username to be?\n");
-			
-    	if (isValidName(myName)) {
-			int isAvailable = 1;
-			for (int i = 0; i < numberOfUsers; i++) {
-            	if (strcmp(users[i].username, myName) == 0) {
-                	printf("myName is unavailable, Please select another name.\n\n");
-					isAvailable = 0;
-					break;
-        		}
-			}
-			if (isAvailable) {
-				while (1) {
-					printf("What would you like your password to be?\n");
-					if (isValidPass(Pass)) {
-        				printf("Welcome %s\n\n", myName);
-						writeUserToFile(myName, Pass);
-						return;
-   					} else {
-						printf("Password cannot contain spaces, Please try again.\n\n");
-					}
-				}
-			}
-		} else {
-        	printf("Invalid name, Please select another name.\n\n");
-    	}
-	}
-}
 
 int start(void) {
     while (1) {
@@ -115,12 +72,12 @@ int menu(void) {
 
 		promptUserForInput("%d", &choice);		
 
-        switch (choice) {
-            case 1:
-                printf("Starting chat with a random...\n\n");
-                break;
-            case 2:
-                printf("Showing friends menu...\n\n");
+		switch (choice) {
+    	case 1:
+			chatWithRandom();
+			break;
+	  	case 2:
+        printf("Showing friends menu...\n\n");
                 friends();
 				break;
 			case 3:
@@ -129,9 +86,13 @@ int menu(void) {
 				break;
             case 4:
                 printf("Opening settings...\n\n");
+				settingsMenu();
                 break;
             case 5:
                 printf("Goodbye!\n");
+				active = false;
+				updateStatus(myName);
+				updateUsersArray();
                 exit(0);
             default:
                 printf("Invalid choice. Please select a valid option.\n\n");
@@ -141,4 +102,76 @@ int menu(void) {
 
     return 0;
 }
+
+void chatWithRandom() {
+	for (int i = 0; i < numberOfUsers; i++) {
+		if (strcmp(users[i].username, myName) == 0) {
+		} else if (strcmp(users[i].status, "Online") == 0) {
+			printf("Starting chat with random...\n");
+			printf("You are now chatting with %s.\n\n", users[i].username);
+		} else {
+			printf("Noone is online at the moment.\n\n");
+			menu();
+		}
+	}
+}
+
+
+void login(void) {
+	while (true) {
+		if (numberOfUsers == 0) {
+			printf("There are no users.\n\n");
+			exit(0);
+		}
+
+        printf("Username\n");
+   
+        if (isValidName(myName)) {
+    		printf("Password\n");
+       	    if (isValidPass(myPass)) {
+				for (int i = 0; i < numberOfUsers; i++) {
+              		if (strcmp(users[i].username, myName) == 0 && strcmp(users[i].password, myPass) == 0) {
+	           			printf("Welcome back %s\n\n", myName);
+						active = true;
+						updateStatus(myName);
+						updateUsersArray();
+                    	return;	
+					}
+    			}    
+				printf("Invalid username or password\n\n");
+	  		}
+       	} 
+	}
+}
+
+void registerUser(void) {
+	while (1) {
+		printf("What would you like your username to be?\n");
+			
+    	if (isValidName(myName)) {
+			int isAvailable = 1;
+			for (int i = 0; i < numberOfUsers; i++) {
+            	if (strcmp(users[i].username, myName) == 0) {
+                	printf("Name is unavailable, Please select another name.\n\n");
+					isAvailable = 0;
+					break;
+        		}
+			}
+			if (isAvailable) {
+				while (1) {
+					printf("What would you like your password to be?\n");
+					if (isValidPass(myPass)) {
+        				printf("Welcome %s\n\n", myName);
+						active = true;
+						writeUserToFile("users.csv", myName, myPass);
+						updateUsersArray();
+						return;
+   					} 
+				}
+			}
+		} 
+	}
+}
+
+
 
