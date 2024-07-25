@@ -17,7 +17,7 @@ char friendList[MAX_FRIENDS][NAME_LEN];
 char message[MSG_LEN];
 int numberOfFriends = 0;
 int numOfFRequests = 0;
-char friendRequests[10][100];
+char friendRequests[MAX_FRIENDS][NAME_LEN];
 
 int friends(void) {
 
@@ -73,7 +73,7 @@ void fReqMenu(char *name) {
 			case 2:
 				snprintf(message, sizeof(message), "DECLINEFRIENDREQ %s %s", myName, name);
                 sendMessage(message);
-				declineFReq(name);
+				removeFReq(name);
 				return;
 			case 3:
 				friends();
@@ -110,7 +110,7 @@ void showFriendRequests() {
             printf("Accepted all friend requests.\n\n");
 			return;
 		} else if (choice == i + 2) {
-            declineAllFReq();
+            removeAllFReq();
             printf("Declined all friend requests.\n\n");
 			return;
         } else if (choice == i + 3) { 
@@ -125,6 +125,7 @@ void showFriendRequests() {
 
 void messageFriend(void) {
 	int lenOfMsg = 0;
+	char messageToSend[256];
 
 	while (1) {
 		printf("Type the name of the friend you would like to message\n");
@@ -139,13 +140,14 @@ void messageFriend(void) {
 						lenOfMsg = strlen(message);
 						printf("%d\n\n", lenOfMsg);
 						if (lenOfMsg >= MSG_LEN) {
-							printf("Message exceeded limit, Please try again\n\n");
+							printf("message limit exceeded.\n\n");
+							return;
 						} else {
 							break;	
 						}
 					}
-					printf("me -> %s) %s\n\n", nameOfFriend, message);
-
+					snprintf(messageToSend, sizeof(messageToSend), "MESSAGE %s %s %s", myName, nameOfFriend, message);
+					sendMessage(messageToSend);
 					return;
 				}
 			}	

@@ -143,6 +143,7 @@ void writeUserToFile(char *filename, char *name, char *pass) {
 
     initializeFriendFiles("friends.csv", name);
     initializeFriendFiles("friendReq.csv", name);
+	printf("initializing friend request file.\n\n");
 }
 
 
