@@ -26,7 +26,6 @@ int updateFriendFile(char *filename) {
 	FILE *file;
     if ((file = openFile(filename, "r")) == NULL) return -1;	
 
-	numLines = 0;
 	clearArrays();
 
 	if (fgets(line, sizeof(line), file)) {
@@ -71,6 +70,9 @@ int updateFriendFile(char *filename) {
 
 void clearArrays() {
 	userCount = 0;
+	numLines = 0;
+
+	line[0] = '\0';
 
 	for (int i = 0; i < MAX_USERS; i++) {
 		headers[userCount++][0] = '\0';
@@ -85,42 +87,10 @@ void clearArrays() {
 	userCount = 0;
 }
 
-void initializeFriendFiles(char *filename, const char *username) {
-    FILE *file;
-    if ((file = openFile(filename, "r+")) == NULL) return;
-	
-	clearArrays();
+void initializeFriendFiles(char *filename, const char *username) {	
+	FILE *file;
+	updateFriendFile(filename);
 
-    if (fgets(line, sizeof(line), file)) {
-        char *token = strtok(line, ",\n");
-        while (token) {
-            strcpy(headers[userCount++], token);
-            token = strtok(NULL, ",\n");
-        }
-    }
-
-    while (fgets(line, sizeof(line), file)) {
-        char *token = strtok(line, ",\n");
-        int j = 0;
-        while (token) {
-            if (strlen(token) > 0) {
-                strcpy(friendsArray[numLines][j], token);
-                j++;
-            }
-            token = strtok(NULL, ",\n");
-        }
-        numLines++;
-    }
-
-    fclose(file);
-
-    for (int i = 0; i < userCount; i++) {
-        if (strcmp(headers[i], username) == 0) {
-            printf("User %s already exists in the friendsArray file.\n", username);
-            return;
-        }
-    }
-	
 	strncpy(headers[userCount++], username, NAME_LEN);
 
     if ((file = openFile(filename, "w")) == NULL) return;
@@ -151,45 +121,9 @@ void initializeFriendFiles(char *filename, const char *username) {
     fclose(file);
 }
 
-void writeFriendToFile(char *username, char *friendName) {
-    FILE *file;
-    if ((file = openFile("friendsArray.csv", "r+")) == NULL) return;
-
-    if (fgets(line, sizeof(line), file)) {
-        char *token = strtok(line, ",\n");
-        while (token) {
-            strncpy(headers[userCount++], token, MAX_LINE_LENGTH);
-            token = strtok(NULL, ",\n");
-        }
-    }
-
-    while (fgets(line, sizeof(line), file)) {
-        char *token = strtok(line, ",\n");
-        int j = 0;
-        while (token) {
-            if (strlen(token) > 0) {
-                strncpy(friendsArray[numLines][j], token, MAX_LINE_LENGTH);
-                j++;
-            }
-            token = strtok(NULL, ",\n");
-        }
-        numLines++;
-    }
-
-    fclose(file);
-
-    int userIndex = -1;
-    for (int i = 0; i < userCount; i++) {
-        if (strcmp(headers[i], username) == 0) {
-            userIndex = i;
-            break;
-        }
-    }
-
-    if (userIndex == -1) {
-        printf("User %s not found.\n", username);
-        return;
-    }
+void writeFriendToFile(char *filename, char *username, char *friendName) {
+	FILE *file;
+	int userIndex = updateFriendFile(filename);
 
     for (int i = 0; i < MAX_FRIENDS; i++) {
         if (strlen(friendsArray[i][userIndex]) == 0) {
@@ -198,7 +132,7 @@ void writeFriendToFile(char *username, char *friendName) {
         }
     }
 
-	if ((file = openFile("friendsArray.csv", "w")) == NULL) return;
+	if ((file = openFile(filename, "w")) == NULL) return;
 
     for (int i = 0; i < userCount; i++) {
         fprintf(file, "%s", headers[i]);
@@ -207,14 +141,24 @@ void writeFriendToFile(char *username, char *friendName) {
     fprintf(file, "\n");
 
     for (int i = 0; i < MAX_FRIENDS; i++) {
+        bool isEmptyLine = true;
         for (int j = 0; j < userCount; j++) {
-            fprintf(file, "%s", friendsArray[i][j]);
-            if (j < userCount - 1) fprintf(file, ",");
+            if (strlen(friendsArray[i][j]) > 0) {
+                isEmptyLine = false;
+                break;
+            }
         }
-        fprintf(file, "\n");
+
+        if (!isEmptyLine) {
+            for (int j = 0; j < userCount; j++) {
+                fprintf(file, "%s", friendsArray[i][j]);
+                if (j < userCount - 1) fprintf(file, ",");
+            }
+            fprintf(file, "\n");
+        }
     }
 
-    fclose(file);
+	fclose(file);
 }
 
 void updateFReq() {
@@ -236,17 +180,20 @@ void updateFReq() {
 }
 
 void acceptAllFReq() {
-	int userIndex = updateFriendFile("friends.csv");
+	int userIndex = updateFriendFile("friendReq.csv");
 
 	for (int i = 0; i < MAX_FRIENDS; i++) {
-		writeFriendToFile(friendsArray[i][userIndex], myName);
+		writeFriendToFile("friends.csv", friendsArray[i][userIndex], myName);
 		removeFReq(friendsArray[i][userIndex]);
 	}
+
+	updateFriendArray();
 }
 
 void acceptFReq(char *name) {
-	writeFriendToFile(name, myName);
+	writeFriendToFile("friends.csv", name, myName);
 	removeFReq(name);
+	updateFriendArray();
 }
 
 void removeFReq(char *name) {
@@ -269,15 +216,17 @@ void removeFReq(char *name) {
 
     for (int i = 0; i < MAX_FRIENDS; i++) {
         for (int j = 0; j < userCount; j++) {
-            fprintf(file, "%s", friendsArray[i][j]);
+			if (strlen(friendsArray[i][j]) > 0) {
+				fprintf(file, "%s", friendsArray[i][j]);
+			}
             if (j < userCount - 1) fprintf(file, ",");
         }
         fprintf(file, "\n");
     }
     fclose(file);
 
-    remove("friendsArray.csv");
-    rename("tempFReq.csv", "friendsArray.csv");
+    remove("friendReq.csv");
+    rename("tempFReq.csv", "friendReq.csv");
 }
 
 void removeAllFReq() {
@@ -289,39 +238,7 @@ void removeAllFReq() {
 }
 
 void updateFriendArray() {
-    FILE *file;
-    if ((file = openFile("friendsArray.csv", "r")) == NULL) return;
-
-    if (fgets(line, sizeof(line), file)) {
-        char *token = strtok(line, ",\n");
-        while (token) {
-            strncpy(headers[userCount++], token, NAME_LEN);
-            token = strtok(NULL, ",\n");
-        }
-    }
-
-    while (fgets(line, sizeof(line), file)) {
-        char *token = strtok(line, ",\n");
-        int j = 0;
-        while (token) {
-            if (strlen(token) > 0) {
-                strncpy(friendsArray[numLines][j], token, NAME_LEN);
-                j++;
-            }
-            token = strtok(NULL, ",\n");
-        }
-        numLines++;
-    }
-
-    fclose(file);
-
-    int myIndex = -1;
-    for (int i = 0; i < userCount; i++) {
-        if (strcmp(headers[i], myName) == 0) {
-            myIndex = i;
-            break;
-        }
-    }
+	int myIndex = updateFriendFile("friendReq.csv");
 
     int i = 0;
     for (i = 0; i < numLines; i++) {
@@ -330,8 +247,4 @@ void updateFriendArray() {
         }
     }
 	numberOfFriends = i;
-}
-void addFriendToArray(char *username, char *friendName) {
-    writeFriendToFile(username, friendName);
-    updateFriendArray();
 }
