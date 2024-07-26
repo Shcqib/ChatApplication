@@ -73,7 +73,9 @@ void fReqMenu(char *name) {
 			case 2:
 				snprintf(message, sizeof(message), "DECLINEFRIENDREQ %s %s", myName, name);
                 sendMessage(message);
+				printf("Decling %s friend request", name);
 				removeFReq(name);
+				printf("Decling %s friend request", name);
 				return;
 			case 3:
 				friends();
