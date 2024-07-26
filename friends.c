@@ -13,11 +13,8 @@ void showFriendRequests();
 void showFriendList(void);
 void addFriend(void);
 
-char friendList[MAX_FRIENDS][NAME_LEN];
+
 char message[MSG_LEN];
-int numberOfFriends = 0;
-int numOfFRequests = 0;
-char friendRequests[MAX_FRIENDS][NAME_LEN];
 
 int friends(void) {
 
@@ -85,7 +82,7 @@ void fReqMenu(char *name) {
 }
 
 void showFriendRequests() {
-    updateFReq();
+    updateFReq(myName);
 
     while (true) {
         if (numOfFRequests == 0) {
@@ -218,6 +215,8 @@ void addFriend(void) {
 }
 
 void showFriendList(void) {
+	updateFriendArray(myName);
+
 	if (numberOfFriends == 0) {
 		printf ("You have no friends.\n\n");
 	}

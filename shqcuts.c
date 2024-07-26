@@ -110,6 +110,70 @@ FILE *openFile(char *filename, char *format) {
 	return file;
 }
 
+void initializeGroupFile(char *username) {
+	FILE *file;
+	if ((file = openFile("groups.csv", "a")) == NULL) return;
+
+	char line[256];
+	char headers[MAX_USERS][NAME_LEN];
+	char groupsArray[MAX_GROUPS][MAX_USERS][NAME_LEN] = {0};
+	int userCount = 0;
+	int numLines = 0;
+
+	if (fgets(line, sizeof(line), file)) {
+		char *token = strtok(line, ",\n");
+		while (token) {
+			strcpy(headers[userCount++], token);
+			token = strtok(NULL, ",\n");
+		}
+	}
+
+	while (fgets(line, sizeof(line), file)) {
+		char *linePtr = line;
+		char *token = strsep(&linePtr, ",\n");
+		int j = 0;
+
+        while (token) {
+            strcpy(groupsArray[numLines][j], token);
+            j++;
+            token = strsep(&linePtr, ",\n");
+        }
+
+        numLines++;
+	}
+
+	fclose(file);
+
+	strcpy(headers[userCount++], username);
+
+	if ((file = openFile("groups.csv", "w")) == NULL) return;
+
+    for (int i = 0; i < userCount; i++) {
+        fprintf(file, "%s", headers[i]);
+        if (i < userCount - 1) fprintf(file, ",");
+    }
+    printf("\n");
+
+    for (int i = 0; i < numLines; i++) {
+        int isEmptyLine = true;
+        for (int j = 0; j < userCount; j++) {
+            if (strlen(groupsArray[i][j]) > 0) {
+                isEmptyLine = false;
+                break;
+            }
+        }
+        if (!isEmptyLine) {
+            for (int j = 0; j < userCount; j++) {
+                fprintf(file, "%s", groupsArray[i][j]);
+                if (j < userCount - 1) fprintf(file, ",");
+            }
+            fprintf(file, "\n");
+        }
+    }
+
+    fclose(file);
+}
+
 void writeToFile(char *filename, char *name) {
 	FILE *file, *groupFile;
 	if ((file = openFile(filename, "a")) == NULL) return;
@@ -139,8 +203,8 @@ void writeUserToFile(char *filename, char *name, char *pass) {
     }
     fclose(file);
 
-    initializeFriendFiles("friends.csv", name);
-    initializeFriendFiles("friendReq.csv", name);
+    initializeFile("friends.csv", name);
+    initializeFile("friendReq.csv", name);
 	printf("initializing friend request file.\n\n");
 }
 
