@@ -110,81 +110,6 @@ FILE *openFile(char *filename, char *format) {
 	return file;
 }
 
-void initializeGroupFile(char *username) {
-	FILE *file;
-	if ((file = openFile("groups.csv", "a")) == NULL) return;
-
-	char line[256];
-	char headers[MAX_USERS][NAME_LEN];
-	char groupsArray[MAX_GROUPS][MAX_USERS][NAME_LEN] = {0};
-	int userCount = 0;
-	int numLines = 0;
-
-	if (fgets(line, sizeof(line), file)) {
-		char *token = strtok(line, ",\n");
-		while (token) {
-			strcpy(headers[userCount++], token);
-			token = strtok(NULL, ",\n");
-		}
-	}
-
-	while (fgets(line, sizeof(line), file)) {
-		char *linePtr = line;
-		char *token = strsep(&linePtr, ",\n");
-		int j = 0;
-
-        while (token) {
-            strcpy(groupsArray[numLines][j], token);
-            j++;
-            token = strsep(&linePtr, ",\n");
-        }
-
-        numLines++;
-	}
-
-	fclose(file);
-
-	strcpy(headers[userCount++], username);
-
-	if ((file = openFile("groups.csv", "w")) == NULL) return;
-
-    for (int i = 0; i < userCount; i++) {
-        fprintf(file, "%s", headers[i]);
-        if (i < userCount - 1) fprintf(file, ",");
-    }
-    printf("\n");
-
-    for (int i = 0; i < numLines; i++) {
-        int isEmptyLine = true;
-        for (int j = 0; j < userCount; j++) {
-            if (strlen(groupsArray[i][j]) > 0) {
-                isEmptyLine = false;
-                break;
-            }
-        }
-        if (!isEmptyLine) {
-            for (int j = 0; j < userCount; j++) {
-                fprintf(file, "%s", groupsArray[i][j]);
-                if (j < userCount - 1) fprintf(file, ",");
-            }
-            fprintf(file, "\n");
-        }
-    }
-
-    fclose(file);
-}
-
-void writeToFile(char *filename, char *name) {
-	FILE *file, *groupFile;
-	if ((file = openFile(filename, "a")) == NULL) return;
-	if ((groupFile = openFile("groups.csv", "a")) == NULL) return;
-
-	fprintf(groupFile, "%s\n", filename);
-	fprintf(file, "%s\n", name);
-	fclose(file);
-	fclose(groupFile);
-}
-
 void writeUserToFile(char *filename, char *name, char *pass) { 
     FILE *file;
     if ((file = openFile(filename, "a")) == NULL) return;
@@ -203,71 +128,9 @@ void writeUserToFile(char *filename, char *name, char *pass) {
     }
     fclose(file);
 
+	initializeGroupFile(name);
     initializeFile("friends.csv", name);
     initializeFile("friendReq.csv", name);
-	printf("initializing friend request file.\n\n");
-}
-
-
-void writeGroupMemberToFile(char *filename, char *name, char *role) {
-	FILE *file;
-    if ((file = openFile(filename, "a")) == NULL) return;
-
-	fprintf(file, "%s,%s\n", role, name);
-
-    fclose(file);
-}
-
-void updateGroups() {
-	FILE *file;
-    if ((file = openFile("groups.csv", "r")) == NULL) return;
-
-	char nameOfGroup[NAME_LEN];
-
-	while (fscanf(file, "%s\n", nameOfGroup) != EOF) {
-		updateGroupArray(nameOfGroup);
-	}
-
-	fclose(file);
-}
-
-
-void updateGroupArray(char *filename) {
-    FILE *file;
-    if ((file = openFile(filename, "r")) == NULL) return;
-
-	char groupName[NAME_LEN], name[NAME_LEN], role[NAME_LEN];
-	int j = 0;
-
-    if (fscanf(file, "%s\n", groupName) == EOF) {
-        fclose(file);
-        return; 
-    }
-
-	int groupIndex = -1;
-    for (int i = 0; i < numberOfGroups; i++) {
-        if (strcmp(groups[i].groupName, groupName) == 0) {
-            groupIndex = i;
-            break;
-        }
-    }
-
-	if (groupIndex == -1) {
-        groupIndex = numberOfGroups++;
-        strcpy(groups[groupIndex].groupName, groupName);
-        groups[groupIndex].amountOfMembers = 0;
-    }
-
-	while (fscanf(file, "%[^,],%s\n", role, name) != EOF) {
-        strcpy(groups[groupIndex].members[j].name, name);
-		strcpy(groups[groupIndex].members[j].role, role);
-		j++;
-    }
-
-	groups[groupIndex].amountOfMembers = j;	
-	numOfMembers = j;
-
-    fclose(file);
 }
 
 void replacePassword(char *name, char *pass) {
@@ -325,40 +188,6 @@ void removeUser(char *name) {
         rename("tempUsers.csv", "users.csv");
     } else {
         remove("tempUsers.csv");
-    }
-}
-
-void removeGroup(char *filename, char *groupname) {
-    FILE *file, *tempFile;
-    if  ((file = openFile("groups.csv", "r+")) == NULL) return;
-    if  ((tempFile = openFile("tempGroups.csv", "a")) == NULL) return;
-
-    int found = 0;
-    char nameOfGroup[NAME_LEN];
-
-    while (fscanf(file, "%s\n", nameOfGroup) != EOF) {
-        if (strcmp(nameOfGroup, filename) == 0) {
-            found = 1;
-        } else {
-            fprintf(tempFile, "%s\n", nameOfGroup);
-        }
-    }
-
-    fclose(file);
-    fclose(tempFile);
-
-    if (found) {
-        remove("groups.csv");
-		remove(filename);
-        rename("tempGroups.csv", "groups.csv");
-		for (int i = 0; i < numberOfGroups; i++) {
-			if (strcmp(groups[i].groupName, groupname) == 0) {
-				groups[i] = groups[i + 1];
-			}
-		}
-		numberOfGroups--;
-    } else {
-        remove("tempGroups.csv");
     }
 }
 
