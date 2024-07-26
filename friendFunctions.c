@@ -14,6 +14,11 @@
 void removeFReq(char *name);
 void clearArrays();
 
+char friendList[MAX_FRIENDS][NAME_LEN];
+int numberOfFriends = 0;
+int numOfFRequests = 0;
+char friendRequests[MAX_FRIENDS][NAME_LEN];
+
 char nameInFile[NAME_LEN], passInFile[NAME_LEN], statusInFile[NAME_LEN], nameOfFriend[NAME_LEN];
 
 char line[MAX_LINE_LENGTH];
@@ -22,7 +27,7 @@ char friendsArray[MAX_FRIENDS][MAX_USERS][NAME_LEN] = {{{0}}};
 int userCount = 0;
 int numLines = 0;
 
-int updateFriendFile(char *filename) {
+int updateFriendFile(char *filename, char *username) {
 	FILE *file;
     if ((file = openFile(filename, "r")) == NULL) return -1;	
 
@@ -54,7 +59,7 @@ int updateFriendFile(char *filename) {
 
 	int userIndex = -1;
     for (int i = 0; i < userCount; i++) {
-        if (strcmp(headers[i], myName) == 0) {
+        if (strcmp(headers[i], username) == 0) {
             userIndex = i;
 			return userIndex;
         }
@@ -89,7 +94,7 @@ void clearArrays() {
 
 void initializeFriendFiles(char *filename, const char *username) {	
 	FILE *file;
-	updateFriendFile(filename);
+	updateFriendFile(filename, myName);
 
 	strncpy(headers[userCount++], username, NAME_LEN);
 
@@ -123,7 +128,7 @@ void initializeFriendFiles(char *filename, const char *username) {
 
 void writeFriendToFile(char *filename, char *username, char *friendName) {
 	FILE *file;
-	int userIndex = updateFriendFile(filename);
+	int userIndex = updateFriendFile(filename, username);
 
     for (int i = 0; i < MAX_FRIENDS; i++) {
         if (strlen(friendsArray[i][userIndex]) == 0) {
@@ -161,10 +166,10 @@ void writeFriendToFile(char *filename, char *username, char *friendName) {
 	fclose(file);
 }
 
-void updateFReq() {
+void updateFReq(char *name) {
     memset(*friendRequests, 0, sizeof(friendRequests));
 
-	int myIndex = updateFriendFile("friendReq.csv");
+	int myIndex = updateFriendFile("friendReq.csv", name);
 
     int j = 0;
     for (int i = 0; i < numLines; i++) {
@@ -180,24 +185,28 @@ void updateFReq() {
 }
 
 void acceptAllFReq() {
-	int userIndex = updateFriendFile("friendReq.csv");
+	int userIndex = updateFriendFile("friendReq.csv", myName);
 
 	for (int i = 0; i < MAX_FRIENDS; i++) {
 		writeFriendToFile("friends.csv", friendsArray[i][userIndex], myName);
+		writeFriendToFile("friends.csv", myName, friendsArray[i][userIndex]);
 		removeFReq(friendsArray[i][userIndex]);
+		updateFriendArray(friendsArray[i][userIndex]);
 	}
 
-	updateFriendArray();
+	updateFriendArray(myName);
 }
 
 void acceptFReq(char *name) {
+	writeFriendToFile("friends.csv", myName, name);
 	writeFriendToFile("friends.csv", name, myName);
 	removeFReq(name);
-	updateFriendArray();
+	updateFriendArray(myName);
+	updateFriendArray(name);
 }
 
 void removeFReq(char *name) {
-	int userIndex = updateFriendFile("friendReq.csv");
+	int userIndex = updateFriendFile("friendReq.csv", myName);
 
     for (int i = 0; i < MAX_FRIENDS; i++) {
         if (strcmp(friendsArray[i][userIndex], name) == 0) {
@@ -230,21 +239,22 @@ void removeFReq(char *name) {
 }
 
 void removeAllFReq() {
-	int userIndex = updateFriendFile("friends.csv");
+	int userIndex = updateFriendFile("friends.csv", myName);
 
 	for (int i = 0; i < MAX_FRIENDS; i++) {
 		removeFReq(friendsArray[i][userIndex]);
     }
 }
 
-void updateFriendArray() {
-	int myIndex = updateFriendFile("friendReq.csv");
+void updateFriendArray(char *name) {
+    memset(*friendList, 0, sizeof(friendList));
+	numberOfFriends = 0;
 
-    int i = 0;
-    for (i = 0; i < numLines; i++) {
+    int myIndex = updateFriendFile("friends.csv", name);
+
+    for (int i = 0; i < numLines; i++) {
         if (strlen(friendsArray[i][myIndex]) > 0) {
-            strncpy(friendList[i], friendsArray[i][myIndex], NAME_LEN);
+            strncpy(friendList[numberOfFriends++], friendsArray[i][myIndex], NAME_LEN);
         }
     }
-	numberOfFriends = i;
 }

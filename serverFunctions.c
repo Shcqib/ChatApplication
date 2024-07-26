@@ -157,7 +157,6 @@ void sendFriendRequest(char *buffer, int clientfd) {
 			snprintf(messageToSend, sizeof(messageToSend), "\n%s has sent you a friend request.\n", name);
 			sendClientMessage(messageToSend, clients[i].clientfd);
 			writeFReqToFile(recipientName, name);
-			printf("added %s to file", name);
 		}                                                                                                                     
     }  
 }

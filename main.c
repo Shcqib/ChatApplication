@@ -4,7 +4,6 @@
 #include "shqcuts.h"
 #include <stdbool.h>
 
-char myName[NAME_LEN];
 char myPass[NAME_LEN];
 bool active;
 
@@ -16,9 +15,7 @@ void chatWithRandom();
 
 int main(void) {
 	updateUsersArray();	
-	updateFriendArray();
 	updateGroups();
-	updateFReq();
 	for (int i = 0; i < numberOfFriends; i++) {
 		printf("friend %d = %s", i + 1, friendList[i]);
 	}
@@ -30,6 +27,8 @@ int main(void) {
 		printf("\n"); 
 	}
 	start();
+	updateFriendArray(myName);
+	updateFReq(myName);
 	clientSocket();
 	menu();
 	return 0;

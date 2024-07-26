@@ -17,8 +17,6 @@ int sockfd = 0;
 int c;
 
 void *receiveMessageFromServer(void *arg);
-void updateFriendArray();
-
 void clientSocket() {
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);                                                                                                                                                                     
                                                                                                                                                                                                                       
@@ -357,7 +355,7 @@ void removeFriendFromArray(char *name) {
     if (found) {
         remove("friends.csv");
         rename("tempFriends.csv", "friends.csv");
-		updateFriendArray();	
+		updateFriendArray(myName);	
     } else {
         remove("tempFriends.csv");
     }
