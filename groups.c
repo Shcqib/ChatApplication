@@ -84,10 +84,7 @@ void createGroup() {
 		char nameOfGroup[NAME_LEN];
    		printf("What would you like to call your group?\n");
 		if (isValidName(nameOfGroup)) {
-			char filename[NAME_LEN];
-			snprintf(filename, sizeof(filename), "%sMembers.csv", nameOfGroup);
-			writeToFile(filename, nameOfGroup);
-			writeGroupMemberToFile(filename, myName, "Admin");
+			writeGroupToFile(nameOfGroup);
 			updateGroups();
 			printf("You have successfully created the group %s.\n\n", nameOfGroup);
 			groupMenu(&groups[numberOfGroups - 1]);

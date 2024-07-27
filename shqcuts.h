@@ -3,6 +3,7 @@
 #ifndef SHQCUTS_H
 #define SHQCUTS_H
 
+#define MAX_LINE_LENGTH 256
 #define MAX_GROUPS 2
 #define MAX_MEMBERS 5
 
@@ -11,30 +12,32 @@
 #define MSG_LEN 100
 #define NAME_LEN 20
 
+void writeGroupToFile(char *groupName);
 void updateStatus(char *name);
 int main(void);
-void initializeFriendFiles(char *filename, const char *username);
+void initializeGroupFile(char *username);
+void initializeFile(char *filename, const char *username);
 FILE *openFile(char *filename, char *format);
-void writeFriendToFile(char *username, char *friendName);
+void writeFriendToFile(char *filename, char *username, char *friendName);
 void acceptAllFReq();
-void declineAllFReq();
+void removeAllFReq();
 void acceptFReq(char *name);
-void declineFReq(char *name);
+void removeFReq(char *name);
 void removeUser(char *name);
 void replaceUsername(char *name, char *prevName);
 void clientSocket();
 void sendMessage(char *bufferToSend);
 void removeGroup(char *filename, char *groupname);
 void replacePassword(char *name, char *pass);
-void writeGroupMemberToFile(char *groupName, char *name, char *role);
+void writeGroupMemberToFile(char *groupName, char *name);
 void removeMember(char *name, char *filename);
-void updateFReq();
+void updateFReq(char *name);
 void writeToFile(char *filename, char *name);
 void writeUserToFile(char *filename, char *name, char *pass);
 void updateUsersArray(void);
 void addGroupToArray(char *name);
 void removeFriendFromArray(char *name);
-void updateFriendArray();
+void updateFriendArray(char *name);
 void updateGroups();
 void updateGroupArray(char *filename);
 void addFriendToArray(char *username, char *friendname);
@@ -60,8 +63,11 @@ extern char friendList[MAX_FRIENDS][NAME_LEN];
 extern int numOfMembers;
 extern bool active;
 extern int numberOfGroups;
-extern char friendRequests[10][100];
+extern char friendRequests[MAX_FRIENDS][NAME_LEN];
 extern int numOfFRequests;
+extern int userCount;
+extern int numLines;
+extern char headers[MAX_USERS][NAME_LEN];
 
 typedef struct {
     char name[NAME_LEN];
