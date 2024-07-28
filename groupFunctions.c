@@ -32,14 +32,12 @@ void clearVariables() {
     }
 }
 
-void updateGroupMemberFile() {
-	int userIndex = updateGroupFile(myName);
-	
+void updateGroupMemberFile(int userIndex) {
 	for (int i = 0; i < numLines; i++) {
 		char filename[256];
-		FILE *memberFile;
+		FILE *file;
 		snprintf(filename, sizeof(filename), "%s_members", groupsArray[numLines][userIndex]);
-		if ((memberFile = openFile(filename, "r")) == NULL) return;
+		if ((file = openFile(filename, "r")) == NULL) return;
 
 		while (fgets(line, sizeof(line), file)) {
 			char *token = strtok(line, "\n");
@@ -96,6 +94,7 @@ int updateGroupFile(char *username) {
     for (int i = 0; i < userCount; i++) {
         if (strcmp(headers[i], username) == 0) {
             userIndex = i;
+			updateGroupMemberFile(userIndex);
             return userIndex;
         }
     }
@@ -225,8 +224,13 @@ void updateGroups() {
 	for (int i = 0; i < numLines; i++) {
 		if (strlen(groupsArray[i][userIndex]) > 0) {
 			for (int j = 0; j < MAX_GROUPS; j++) {
-				if (strlen(groups[j].groupName) > 0) {
+				if (strlen(groups[j].groupName) == 0) {
 					strcpy(groups[j].groupName, groupsArray[i][userIndex]);
+					for (int k = 0; k < MAX_MEMBERS; k++) {
+						if (strlen(membersArray[k][numLines]) > 0) {
+							strcpy(groups[j].members[k].name, membersArray[k][numLines]);	
+						}
+					}
 				}
 			}
 		}
@@ -238,9 +242,10 @@ void writeGroupMemberToFile(char *groupName, char *name) {
 
 	FILE *file;
 	snprintf(filename, sizeof(filename), "%s_members", groupName);
+	printf("creating file with name %s\n", groupName);
 	if ((file = openFile(filename, "a+")) == NULL) return;
 
-	fprintf(file, "%s", name);
+	fprintf(file, "%s\n", name);
 	fclose(file);
 }
 
