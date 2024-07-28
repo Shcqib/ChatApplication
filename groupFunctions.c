@@ -33,6 +33,7 @@ void clearVariables() {
 }
 
 void updateGroupMemberFile(int userIndex) {
+	bool found = false;
 	for (int i = 0; i < numLines; i++) {
 		char filename[256];
 		FILE *file;
@@ -40,26 +41,37 @@ void updateGroupMemberFile(int userIndex) {
 		if ((file = openFile(filename, "r")) == NULL) return;
 
 		while (fgets(line, sizeof(line), file)) {
-			char *token = strtok(line, "\n");
-			while (token) {
-				if (strcmp(token, myName) == 0) {
-					rewind(file);
-					break;
-				}
-				token = strtok(NULL, "\n");
-			}
-			
-			while (token) {
-				for (int i = 0; i < MAX_MEMBERS; i++) {
-					strcpy(membersArray[i][numLines], token); 
-				}
-				token = strtok(NULL, "\n");
-			}
-		}
+            char *token = strtok(line, "\n");
+            while (token) {
+                if (strcmp(token, myName) == 0) {
+                    found = true;
+                    rewind(file);
+                    break;
+                }
+                token = strtok(NULL, "\n");
+            }
+            if (found) break;  
+        }
+
+        if (found) {
+            while (fgets(line, sizeof(line), file)) {
+                char *token = strtok(line, "\n");
+                while (token) {
+					for (int j = 0; j < MAX_MEMBERS; j++) {
+						if (strlen(token) > 0) {
+							strcpy(membersArray[j][i], token);
+						}
+					}
+					token = strtok(NULL, "\n");
+                }
+            }
+        }
+	fclose(file);
 	}
 }
 
 int updateGroupFile(char *username) {
+	printf("updating group file\n");
     FILE *file, memberFile;
     if ((file = openFile("groups.csv", "r")) == NULL) return -1;
 
@@ -108,7 +120,8 @@ int updateGroupFile(char *username) {
 }
 
 void initializeGroupFile(char *username) {
-	updateGroupFile(username);
+	int userIndex = updateGroupFile(username);
+	printf("initializing groupfile\n");
 
 	for (int i = 0; i < userCount; i++) {
         if (strcmp(headers[i], username) == 0) {
@@ -144,6 +157,7 @@ void initializeGroupFile(char *username) {
 		}
 	}
 
+	printf("initialized group file\n");
     fclose(file);
 }
 
@@ -229,7 +243,6 @@ void updateGroups() {
 				for (int k = 0; k < MAX_MEMBERS; k++) {
 					if (strlen(membersArray[k][numLines]) > 0) {
 						strcpy(groups[i].members[k].name, membersArray[k][numLines]);	
-						groups[i].amountOfMembers++;
 					}
 				}
 			}
