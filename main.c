@@ -132,7 +132,7 @@ void login(void) {
               		if (strcmp(users[i].username, myName) == 0 && strcmp(users[i].password, myPass) == 0) {
 	           			printf("Welcome back %s\n\n", myName);
 						active = true;
-						updateStatus(myName);
+						//updateStatus(myName);
 						updateUsersArray();
                     	return;	
 					}

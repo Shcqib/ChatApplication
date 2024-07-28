@@ -60,6 +60,8 @@ void kickFromGroup(Member *member, Group *currentGroup) {
 }
 
 int seeYourCurrentGroups(void) {
+	updateGroups();
+
 	while (1) {
 		int i;
 		if (numberOfGroups > 0) {
@@ -249,6 +251,8 @@ void groupMemberMenu(Group *currentGroup, int curMember) {
 }
 
 void groupMemberList(Group *currentGroup) {
+	updateGroups();
+
 	int i;
 	printf("Current group members\n\n");
 	for	(i = 0; i < currentGroup->amountOfMembers; i++) {

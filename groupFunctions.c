@@ -36,7 +36,7 @@ void updateGroupMemberFile(int userIndex) {
 	for (int i = 0; i < numLines; i++) {
 		char filename[256];
 		FILE *file;
-		snprintf(filename, sizeof(filename), "%s_members", groupsArray[numLines][userIndex]);
+		snprintf(filename, sizeof(filename), "%s_members.csv", groupsArray[i][userIndex]);
 		if ((file = openFile(filename, "r")) == NULL) return;
 
 		while (fgets(line, sizeof(line), file)) {
@@ -221,15 +221,15 @@ void removeGroup(char *filename, char *groupname) {
 void updateGroups() {
 	int userIndex = updateGroupFile(myName);
 
-	for (int i = 0; i < numLines; i++) {
+	for (int i = 0; i < MAX_GROUPS; i++) {
 		if (strlen(groupsArray[i][userIndex]) > 0) {
-			for (int j = 0; j < MAX_GROUPS; j++) {
-				if (strlen(groups[j].groupName) == 0) {
-					strcpy(groups[j].groupName, groupsArray[i][userIndex]);
-					for (int k = 0; k < MAX_MEMBERS; k++) {
-						if (strlen(membersArray[k][numLines]) > 0) {
-							strcpy(groups[j].members[k].name, membersArray[k][numLines]);	
-						}
+			if (strlen(groups[i].groupName) == 0) {
+				strcpy(groups[i].groupName, groupsArray[i][userIndex]);
+				numberOfGroups++;
+				for (int k = 0; k < MAX_MEMBERS; k++) {
+					if (strlen(membersArray[k][numLines]) > 0) {
+						strcpy(groups[i].members[k].name, membersArray[k][numLines]);	
+						groups[i].amountOfMembers++;
 					}
 				}
 			}
@@ -241,7 +241,7 @@ void writeGroupMemberToFile(char *groupName, char *name) {
 	char filename[256];
 
 	FILE *file;
-	snprintf(filename, sizeof(filename), "%s_members", groupName);
+	snprintf(filename, sizeof(filename), "%s_members.csv", groupName);
 	printf("creating file with name %s\n", groupName);
 	if ((file = openFile(filename, "a+")) == NULL) return;
 
