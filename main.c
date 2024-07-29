@@ -14,6 +14,7 @@ int menu(void);
 void chatWithRandom();
 
 int main(void) {
+	printf("hello\n");
 	updateUsersArray();	
 	updateGroups();
 	for (int i = 0; i < numberOfFriends; i++) {
