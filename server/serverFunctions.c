@@ -1,4 +1,5 @@
 #include <sys/socket.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <arpa/inet.h>
 #include <poll.h>
@@ -21,21 +22,25 @@ void allClients() {
 	}
 }
 
-void addClient(char *buffer, int clientfd) {
+void addClient(char *username, int clientfd) {
+	printf("adding client\n");
 	bool clientAdded = false;
-	getName(buffer, name);
 
 	for (int i = 0; i < MAX_CLIENTS; i++) {
-		if (strcmp(clients[i].username, name) == 0) {
+		printf("first for loop\n");
+		if (strcmp(clients[i].username, username) == 0) {
 			return;
 		}
 	}
 
 	for (int i = 0; i < MAX_CLIENTS; i++) {
+		printf("Before accessing clients array.\n");
 		if (!clientAdded && (strlen(clients[i].username)) == 0) {
-			strcpy(clients[i].username, name);
+			printf("before copying data into clients array\n");
+			strcpy(clients[i].username, username);
 			clients[i].clientfd = clientfd;
 			clientAdded = true;
+			printf("Before calling all clients func\n");
 			allClients();
 			return;
 		}
@@ -207,32 +212,59 @@ void sendFriendMessage(char *buffer, int clientfd) {
     sendClientMessage(messageToSend, clientfd);
 }
 
-void handleCommand(char *buffer, int clientfd) {
-	char *firstSpacePosition;
-	char firstWord[256];
+void deserializeMessage(unsigned char *buffer, int clientfd) {
+    MessageType type = buffer[0];
+	size_t dataSize = (size_t)buffer[1];
 
-	firstSpacePosition = strchr(buffer, ' ');
+    if (type == Connect && dataSize != sizeof(S)) {
+        printf("Error: Invalid data size for Connect message\n");
+        return;
+    }
 
-	if (firstSpacePosition != NULL) {
-		int lengthToCopy = firstSpacePosition - buffer;
-		strncpy(firstWord, buffer, lengthToCopy);
-		firstWord[lengthToCopy] = '\0';
-	} else {
-		return;
-	}
+    void *data = malloc(dataSize);
+    if (data == NULL) {
+        printf("Error: Memory allocation failed\n");
+        return;
+    }
 
-    if (strcmp(firstWord, "CONNECT") == 0) {
-        addClient(buffer, clientfd);
-	} else if (strcmp(firstWord, "FRIENDREQUEST") == 0) {
-		sendFriendRequest(buffer, clientfd);	
-	} else if (strcmp(firstWord, "DECLINEFRIENDREQ") == 0) {
-		sendDeclineMsg(buffer, clientfd);
-	} else if (strcmp(firstWord, "ACCEPTFRIENDREQ") == 0) {
-		sendAcceptMsg(buffer, clientfd);
-	} else if (strcmp(firstWord, "MESSAGE") == 0 ) {
-		sendFriendMessage(buffer, clientfd);
-	}
+	memcpy(data, buffer + 2, dataSize);
+
+    switch (type) {
+		case Connect: {
+			S *s = (S *)data;
+			printf("Name to send = %s", s->SenderName);
+			addClient(s->SenderName, clientfd);
+			break;
+		}
+        case SendFriendRequest: {
+            break;
+        }
+        case SendMessageRequest: {
+            break;
+        }
+        default:
+            printf("Unknown message type\n");
+            break;
+    }
+
+    free(data);
 }
+
+void handleCommand(unsigned char *buffer, int clientfd) {
+	deserializeMessage(buffer, clientfd);
+}
+
+   // if (strcmp(firstWord, "CONNECT") == 0) {
+  //      addClient(buffer, clientfd);
+//	} else if (strcmp(firstWord, "FRIENDREQUEST") == 0) {
+//		sendFriendRequest(buffer, clientfd);	
+//	} else if (strcmp(firstWord, "DECLINEFRIENDREQ") == 0) {
+//		sendDeclineMsg(buffer, clientfd);
+//	} else if (strcmp(firstWord, "ACCEPTFRIENDREQ") == 0) {
+//		sendAcceptMsg(buffer, clientfd);
+//	} else if (strcmp(firstWord, "MESSAGE") == 0 ) {
+//		sendFriendMessage(buffer, clientfd);
+//	}
 
 void getRecipientName(char *buffer, char *name) {
 	char *firstSpacePosition, *secondSpacePosition, *thirdSpacePosition;

@@ -12,6 +12,8 @@
 char line[MAX_LINE_LENGTH];
 char groupsArray[MAX_GROUPS][MAX_USERS][NAME_LEN] = {{{0}}};
 char membersArray[MAX_MEMBERS][MAX_GROUPS][NAME_LEN] = {{{0}}};
+int numOfMembers = 0;
+int numberOfGroups = 0;
 
 int updateGroupFile(char *username);
 

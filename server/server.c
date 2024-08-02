@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#define BUFFER_SIZE 256
+#define BUFFER_SIZE 1024
 
 int main() {
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -29,7 +29,7 @@ int main() {
     int num_clients = 0;
 
     for (;;) {
-        char buffer[BUFFER_SIZE] = {0};
+        unsigned char buffer[BUFFER_SIZE] = {0};
 
         fds[1].fd = 0;
         fds[1].events = POLLIN;
@@ -48,9 +48,9 @@ int main() {
 
         if (fds[1].revents & POLLIN) {
             read(0, buffer, BUFFER_SIZE - 1);
-            buffer[strlen(buffer) - 1] = '\0';
+            buffer[strlen((const char *)buffer) - 1] = '\0';
             for (int i = 2; i <= num_clients + 1; i++) {
-                send(fds[i].fd, buffer, strlen(buffer) + 1, 0);
+                send(fds[i].fd, buffer, strlen((const char *)buffer) + 1, 0);
             }
         }
 
@@ -58,6 +58,7 @@ int main() {
             if (fds[i].revents & POLLIN) {
                 int bytes_received = recv(fds[i].fd, buffer, BUFFER_SIZE - 1, 0);
                 if (bytes_received <= 0) {
+					printf("Client disconnected.\n");
                     close(fds[i].fd);
                     fds[i] = fds[num_clients + 1]; 
                     num_clients--;

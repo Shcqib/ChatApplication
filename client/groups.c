@@ -4,9 +4,6 @@
 #include "shqcuts.h"
 #include <stdbool.h>
 
-int numOfMembers = 0;
-int numberOfGroups = 0;
-
 int groupMenu(Group *currentGroup);
 void createGroup(void);
 void groupMemberList(Group *currentGroup);

@@ -28,9 +28,9 @@ void clientSocket() {
     };                                                                                                                                                                                                                
                                                                                                                                                                                                                       
     if (connect(sockfd, (struct sockaddr *)&address, sizeof(address)) == 0) {
-		char message[200];
-		snprintf(message, sizeof(message), "CONNECT %s", myName);
-		sendMessage(CONNECT,  
+		S data;
+		strcpy(data.SenderName, myName);
+		serializeMessage(Connect, &data);
 	}		
 
 	pthread_t recv_thread;
@@ -42,22 +42,26 @@ void clientSocket() {
 
 }	
 
-void formDataStruct(char *string) {
-	
+void sendMessage(char *buffer) {
+
 }
 
-void serializeMessage(MessageType type, void *data, size_t dataSize, unsigned char *buffer) {
-	buffer[0] = type;
-    buffer[1] = dataSize;
-    memcpy(buffer + 2, data, dataSize);	
+void serializeMessage(MessageType reqType, void *data) {                                                  
+    printf("Sending type of %d\n", reqType);                                                              
+    unsigned char buffer[BUFFER_SIZE];                                                                    
+    buffer[0] = '\0';                                                                                     
+                                                                                                          
+    for (int i = 0; i < typeCount; i++) {                                                                 
+        if (reqType == typeRegistry[i].typeIndex) {                                                       
+            buffer[0] = (unsigned char)typeRegistry[i].typeIndex;                                         
+            buffer[1] = (unsigned char)typeRegistry[i].size;                                              
+            memcpy(buffer + 2, data, typeRegistry[i].size);                                               
+                                                                                                          
+            send(sockfd, buffer, typeRegistry[i].size + 2, 0);                                            
+            printf("sent buffer to server %s\n", buffer);                                                 
+        }                                                                                                 
+    }                                                                                                     
 }
-
-void sendMessage(MessageType type, void *data, size_t dataSize, unsigned char *buffer) {
-	serializeMessage(data, &request2, sizeof(Data), buffer);
-
-	send(sockfd, buffer, dataSize + 2, 0);
-}
-
 void *receiveMessageFromServer(void *arg) {
 	while (true) {
 		char buffer[256];

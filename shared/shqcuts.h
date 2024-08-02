@@ -7,10 +7,12 @@
 #define MAX_GROUPS 2
 #define MAX_MEMBERS 5
 
+#define MAX_TYPES 10
 #define MAX_USERS 5
 #define MAX_FRIENDS 5
 #define MSG_LEN 100
 #define NAME_LEN 20
+#define BUFFER_SIZE 1024
 
 void writeGroupToFile(char *groupName);
 void updateStatus(char *name);
@@ -35,6 +37,8 @@ void updateFReq(char *name);
 void writeToFile(char *filename, char *name);
 void writeUserToFile(char *filename, char *name, char *pass);
 void updateUsersArray(void);
+void registerType(int typeIndex, size_t dataSize);
+void registerAllTypes();
 void addGroupToArray(char *name);
 void removeFriendFromArray(char *name);
 void updateFriendArray(char *name);
@@ -58,6 +62,7 @@ extern char nameOfFriend[NAME_LEN];
 extern int choice;
 extern char myName[NAME_LEN];
 extern int sockfd;
+extern int typeCount;
 extern int numberOfFriends;
 extern char friendList[MAX_FRIENDS][NAME_LEN];
 extern int numOfMembers;
@@ -68,6 +73,19 @@ extern int numOfFRequests;
 extern int userCount;
 extern int numLines;
 extern char headers[MAX_USERS][NAME_LEN];
+
+typedef enum {
+	Connect = 1,	
+    SendFriendRequest = 2,
+    SendMessageRequest = 3,
+} MessageType;
+
+typedef struct {
+    int typeIndex;
+    size_t size;
+} TypeInfo;
+
+TypeInfo typeRegistry[MAX_TYPES];
 
 typedef struct {
     char name[NAME_LEN];
@@ -90,14 +108,6 @@ typedef struct {
 	char status[10];
 } User;
 
-typedef enum {
-	CONNECT 1
-	FRIENDREQUEST 2
-	MESSAGE 3
-	ACCEPTFRIENDREQ	4
-	DECLINEFRIENDREQ 5
-} MessageType
-
 typedef struct {
     char SenderName[NAME_LEN];
     char ReceiverName[NAME_LEN];
@@ -117,6 +127,7 @@ extern int numberOfUsers;
 User users[MAX_USERS];
 
 int searchUsername(char *name);
+void serializeMessage(MessageType reqType, void *data);
 int searchPassword(char *pass, char *name);
 
 #endif
