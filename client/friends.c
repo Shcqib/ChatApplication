@@ -13,7 +13,6 @@ void showFriendRequests();
 void showFriendList(void);
 void addFriend(void);
 
-
 char message[MSG_LEN];
 
 int friends(void) {
@@ -195,9 +194,12 @@ void addFriend(void) {
 				bool userExists = false;
 			 	for (int i = 0; i < numberOfUsers; i++) {
                     if (strcmp(users[i].username, nameOfFriend) == 0) {
-						snprintf(message, sizeof(message), "FRIENDREQUEST %s %s", myName, nameOfFriend);
-						sendMessage(message);
-						printf("You have sent %s a friend request.\n\n", nameOfFriend);
+						SRM data;
+						strcpy(data.SenderName, myName);
+						strcpy(data.ReceiverName, nameOfFriend);
+						snprintf(message, sizeof(message), "%s wants to be your friend.", myName);
+						strcpy(data.Message, message);
+						serializeMessage(SendFriendRequest, &data);
 						userExists = true;
                         return;
                     }

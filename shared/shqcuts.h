@@ -10,7 +10,7 @@
 #define MAX_TYPES 10
 #define MAX_USERS 5
 #define MAX_FRIENDS 5
-#define MSG_LEN 100
+#define MSG_LEN 256
 #define NAME_LEN 20
 #define BUFFER_SIZE 1024
 
