@@ -78,6 +78,8 @@ typedef enum {
 	Connect = 1,	
     SendFriendRequest = 2,
     SendMessageRequest = 3,
+	AddFriendRequest = 4,
+	RemoveFriendRequest = 5,
 } MessageType;
 
 typedef struct {
@@ -129,6 +131,9 @@ User users[MAX_USERS];
 int searchUsername(char *name);
 void serializeMessage(MessageType reqType, void *data);
 int searchPassword(char *pass, char *name);
+SR form_sr_struct(char *senderName, char *receiverName);
+S form_s_struct(char *senderName);
+SRM form_srm_struct(char *senderName, char *receiverName, char *message);
 
 #endif
 

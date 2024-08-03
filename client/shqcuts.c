@@ -31,8 +31,7 @@ void clientSocket() {
     };                                                                                                                                                                                                                
                                                                                                                                                                                                                       
     if (connect(sockfd, (struct sockaddr *)&address, sizeof(address)) == 0) {
-		S data;
-		strcpy(data.SenderName, myName);
+		S data = form_s_struct(myName);
 		serializeMessage(Connect, &data);
 	}		
 
@@ -43,6 +42,27 @@ void clientSocket() {
 		exit(1);
 	}
 }	
+
+S form_s_struct(char *senderName) {
+	S s;
+	strcpy(s.SenderName, senderName);	
+	return s;
+}
+
+SR form_sr_struct(char *senderName, char *receiverName) {
+	SR sr;
+	strcpy(sr.SenderName, senderName);	
+	strcpy(sr.ReceiverName, receiverName);
+	return sr;
+}
+
+SRM form_srm_struct(char *senderName, char *receiverName, char *message) {
+	SRM srm;
+	strcpy(srm.SenderName, senderName);	
+	strcpy(srm.ReceiverName, receiverName);
+	strcpy(srm.Message, message);
+	return srm;
+}
 
 void sendMessage(char *t) {
 

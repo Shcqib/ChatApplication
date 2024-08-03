@@ -53,7 +53,7 @@ int friends(void) {
     }
 }
 
-void fReqMenu(char *name) {
+void fReqMenu(char *friendName) {
 	while (true) {
 		printf("1) Accept friend request.\n");
 		printf("2) Decline friend request.\n");
@@ -62,14 +62,12 @@ void fReqMenu(char *name) {
 
 		switch (choice) {
 			case 1:
-				snprintf(message, sizeof(message), "ACCEPTFRIENDREQ %s %s", myName, name);
-				sendMessage(message);
-				acceptFReq(name);
+				SR data = form_sr_struct(myName, friendName);
+				serializeMessage(AddFriendRequest, &data);
 				showFriendRequests();
 			case 2:
-				snprintf(message, sizeof(message), "DECLINEFRIENDREQ %s %s", myName, name);
-                sendMessage(message);
-				removeFReq(name);
+				SR data = form_sr_struct(myName, friendName);
+				serializeMessage(RemoveFriendRequest, &data);
 				showFriendRequests();
 			case 3:
 				friends();

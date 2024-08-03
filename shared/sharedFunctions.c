@@ -19,6 +19,8 @@ void registerType(int typeIndex, size_t dataSize) {
 
 void registerAllTypes() {
 	registerType(Connect, sizeof(S));
-    registerType(SendFriendRequest, sizeof(SRM));
+    registerType(SendFriendRequest, sizeof(SR));
     registerType(SendMessageRequest, sizeof(SRM));
+	registerType(AddFriendRequest, sizeof(SR));
+	registerType(RemoveFriendRequest, sizeof(SR));
 }
