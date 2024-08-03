@@ -13,7 +13,7 @@
 #define friendsFilePath dataPath "friends.csv" 
 #define friendReqFilePath dataPath "friendReq.csv"
 
-void removeFReq(char *name);
+void removeFReq(char *name, char *friendName);
 void clearArrays();
 
 char friendList[MAX_FRIENDS][NAME_LEN];
@@ -196,24 +196,24 @@ void acceptAllFReq() {
 	for (int i = 0; i < MAX_FRIENDS; i++) {
 		writeFriendToFile(friendsFilePath, friendsArray[i][userIndex], myName);
 		writeFriendToFile(friendsFilePath, myName, friendsArray[i][userIndex]);
-		removeFReq(friendsArray[i][userIndex]);
+		removeFReq(friendsArray[i][userIndex], "p");
 	}
 
 	updateFriendArray(myName);
 }
 
-void acceptFReq(char *name) {
-	writeFriendToFile(friendsFilePath, myName, name);
-	writeFriendToFile(friendsFilePath, name, myName);
-	removeFReq(name);
-	updateFriendArray(myName);
+void acceptFReq(char *name, char *friendName) {
+	printf("adding %s as a friend of %s\n", friendName, name);
+	writeFriendToFile(friendsFilePath, name, friendName);
+	removeFReq(name, friendName);
+	updateFriendArray(name);
 }
 
-void removeFReq(char *name) {
-	int userIndex = updateFile(friendReqFilePath, myName);
+void removeFReq(char *name, char *friendName) {
+	int userIndex = updateFile(friendReqFilePath, name);
 
     for (int i = 0; i < MAX_FRIENDS; i++) {
-        if (strcmp(friendsArray[i][userIndex], name) == 0) {
+        if (strcmp(friendsArray[i][userIndex], friendName) == 0) {
             friendsArray[i][userIndex][0] = '\0';
         }
     }
@@ -246,7 +246,7 @@ void removeAllFReq() {
 	int userIndex = updateFile(friendsFilePath, myName);
 
 	for (int i = 0; i < MAX_FRIENDS; i++) {
-		removeFReq(friendsArray[i][userIndex]);
+		removeFReq("p", friendsArray[i][userIndex]);
     }
 }
 

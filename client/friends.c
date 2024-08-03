@@ -61,14 +61,16 @@ void fReqMenu(char *friendName) {
 		promptUserForInput("%d", &choice);
 
 		switch (choice) {
-			case 1:
+			case 1: {
 				SR data = form_sr_struct(myName, friendName);
 				serializeMessage(AddFriendRequest, &data);
-				showFriendRequests();
-			case 2:
+				friends();
+			}
+			case 2: {
 				SR data = form_sr_struct(myName, friendName);
 				serializeMessage(RemoveFriendRequest, &data);
-				showFriendRequests();
+				friends();
+			}
 			case 3:
 				friends();
 			default:

@@ -53,7 +53,6 @@ FILE *openFile(char *filename, char *format) {
 }
 
 void sendClientMessage(char *buffer, int clientfd) {
-	printf("Sending Client with FD = %d this %s\n", clientfd, buffer);
     int bytes_sent = send(clientfd, buffer, strlen(buffer) + 1, 0);
 	if (bytes_sent < 0) {
         perror("send failed");
@@ -77,35 +76,34 @@ void sendFriendRequest(char *namet, char *recipientNamet, int clientfd) {
     }  
 }
 
-void sendAcceptMsg(char *buffer, int clientfd) {
-	getRecipientName(buffer, recipientName);
-	getName(buffer, name);
-
+void acceptFriendRequest(char *namet, char *recipientNamet, int clientfd) {
 	for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (strcmp(recipientName, clients[i].username) == 0) {
-			snprintf(messageToSend, sizeof(messageToSend), "You and %s are now friends.\n\n", name);
+        if (strcmp(recipientNamet, clients[i].username) == 0) {
+			snprintf(messageToSend, sizeof(messageToSend), "You and %s are now friends.\n\n", namet);
 			sendClientMessage(messageToSend, clients[i].clientfd);
+			acceptFReq(recipientName, namet);
+			break;
         }
     }
+
 
 	snprintf(messageToSend, sizeof(messageToSend), "You and %s are now friends.\n\n", recipientName);
 	sendClientMessage(messageToSend, clientfd);
+	acceptFReq(namet, recipientName);
 }
 
 
-void sendDeclineMsg(char *buffer, int clientfd) {
-	getRecipientName(buffer, recipientName);
-	getName(buffer, name);
-
+void removeFriendRequest(char *namet, char *recipientNamet, int clientfd) {
 	for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (strcmp(recipientName, clients[i].username) == 0) {
-			snprintf(messageToSend, sizeof(messageToSend), "%s declined your friend request.\n\n", name);
+        if (strcmp(recipientNamet, clients[i].username) == 0) {
+			snprintf(messageToSend, sizeof(messageToSend), "%s declined your friend request.\n\n", namet);
 			sendClientMessage(messageToSend, clients[i].clientfd);
+			break;
         }
     }
-
-	snprintf(messageToSend, sizeof(messageToSend), "You declined %s friend request.\n\n", recipientName);
-	sendClientMessage(messageToSend, clientfd);
+			snprintf(messageToSend, sizeof(messageToSend), "You declined %s friend request.\n\n", recipientNamet);
+			sendClientMessage(messageToSend, clientfd);
+			removeFReq(namet, recipientNamet);
 }
 
 void sendFriendMessage(char *buffer, int clientfd) {
@@ -140,6 +138,14 @@ void deserializeMessage(unsigned char *buffer, int clientfd) {
 			sendFriendRequest(sr->SenderName, sr->ReceiverName, clientfd);	
             break;
         }
+		case AddFriendRequest: {
+			SR *sr = (SR *)data;
+			acceptFriendRequest(sr->SenderName, sr->ReceiverName, clientfd);	
+		}
+		case RemoveFriendRequest: {
+			SR *sr = (SR *)data;
+			removeFriendRequest(sr->SenderName, sr->ReceiverName, clientfd);	
+		}
         case SendMessageRequest: {
             break;
         }
