@@ -53,19 +53,26 @@ FILE *openFile(char *filename, char *format) {
 }
 
 void sendClientMessage(char *buffer, int clientfd) {
+	printf("Sending Client with FD = %d this %s\n", clientfd, buffer);
     int bytes_sent = send(clientfd, buffer, strlen(buffer) + 1, 0);
-	if (bytes_sent <= 0) {
-		return;
-	}
+	if (bytes_sent < 0) {
+        perror("send failed");
+    } else if (bytes_sent == 0) {
+        printf("Sending 0 bytes\n");
+    } else {
+        printf("Sent %d bytes: %s\n", bytes_sent, buffer);
+    }
 }
 
-void sendFriendRequest(char *namet, char *recipientNamet, char *message, int clientfd) {
+void sendFriendRequest(char *namet, char *recipientNamet, int clientfd) {
 	for (int i = 0; i < MAX_CLIENTS; i++) {                                                                                  
 		if (strcmp(recipientNamet, clients[i].username) == 0) {                                                              
 			snprintf(messageToSend, sizeof(messageToSend), "You have sent %s a friend request.", recipientNamet);
 			sendClientMessage(messageToSend, clientfd);
-			sendClientMessage(message, clients[i].clientfd);
-			writeFriendToFile("friendReq.csv", recipientNamet, namet);
+			snprintf(messageToSend, sizeof(messageToSend), "%s sent you a friend request.", namet);
+			sendClientMessage(messageToSend, clients[i].clientfd);
+			writeFriendToFile("data/friendReq.csv", recipientNamet, namet);
+			return;
 		}                                                                                                                     
     }  
 }
@@ -129,8 +136,8 @@ void deserializeMessage(unsigned char *buffer, int clientfd) {
 			break;
 		}
         case SendFriendRequest: {
-			SRM *srm = (SRM *)data;
-			sendFriendRequest(srm->SenderName, srm->ReceiverName, srm->Message, clientfd);	
+			SR *sr = (SR *)data;
+			sendFriendRequest(sr->SenderName, sr->ReceiverName, clientfd);	
             break;
         }
         case SendMessageRequest: {

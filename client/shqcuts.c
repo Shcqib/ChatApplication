@@ -9,6 +9,9 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
+#define dataPath "data/"                                                                                  
+#define usersFilePath dataPath "users.csv" 
+
 int numberOfUsers = 0;
 char nameOfFriend[NAME_LEN];
 int choice = 0;
@@ -39,10 +42,9 @@ void clientSocket() {
 		close(sockfd);
 		exit(1);
 	}
-
 }	
 
-void sendMessage(char *buffer) {
+void sendMessage(char *t) {
 
 }
 
@@ -63,18 +65,22 @@ void serializeMessage(MessageType reqType, void *data) {
     }                                                                                                     
 }
 void *receiveMessageFromServer(void *arg) {
-	while (true) {
-		char buffer[256];
+    while (true) {
+        char buffer[BUFFER_SIZE] = {0};
 
-		int bytes_received = recv(sockfd, buffer, 255, 0);
-		if (bytes_received <= 0) return NULL;
-		buffer[bytes_received] = '\0';
-		printf("%s", buffer);
-	}
+        int bytes_received = recv(sockfd, buffer, sizeof(buffer) - 1, 0);
+        if (bytes_received <= 0) {
+            if (bytes_received < 0) perror("recv");
+            close(sockfd);
+            return NULL;
+        }
 
-	return NULL;
+        buffer[bytes_received] = '\0'; 
+        printf("%s\n", buffer);
+    }
+
+    return NULL;
 }
-
 void promptUserForInput(const char *type, void *input) {
 	printf(": ");
 	scanf(type, input);
@@ -146,13 +152,13 @@ void writeUserToFile(char *filename, char *name, char *pass) {
     fclose(file);
 
 	initializeGroupFile(name);
-    initializeFile("friends.csv", name);
-    initializeFile("friendReq.csv", name);
+    initializeFile("data/friends.csv", name);
+    initializeFile("data/friendReq.csv", name);
 }
 
 void replacePassword(char *name, char *pass) {
 	FILE *file, *tempFile;
-	if  ((file = openFile("users.csv", "r")) == NULL) return;
+	if  ((file = openFile(usersFilePath, "r")) == NULL) return;
 	if  ((tempFile = openFile("tempUsers.csv", "a")) == NULL) return;
 
     int found = 0;
@@ -172,8 +178,8 @@ void replacePassword(char *name, char *pass) {
 
     if (found) {
         writeUserToFile("tempUsers.csv",	name, pass);
-        remove("users.csv");
-        rename("tempUsers.csv", "users.csv");
+        remove(usersFilePath);
+        rename("tempUsers.csv", usersFilePath);
         printf("Password successfully changed.\n\n");
     } else {
         remove("tempUsers.csv");
@@ -182,7 +188,7 @@ void replacePassword(char *name, char *pass) {
 
 void removeUser(char *name) {
 	FILE *file, *tempFile;
-    if  ((file = openFile("users.csv", "r")) == NULL) return;
+    if  ((file = openFile(usersFilePath, "r")) == NULL) return;
     if  ((tempFile = openFile("tempUsers.csv", "a")) == NULL) return;
 
     int found = 0;
@@ -201,8 +207,8 @@ void removeUser(char *name) {
     fclose(tempFile);
 
     if (found) {
-        remove("users.csv");
-        rename("tempUsers.csv", "users.csv");
+        remove(usersFilePath);
+        rename("tempUsers.csv", usersFilePath);
     } else {
         remove("tempUsers.csv");
     }
@@ -273,7 +279,7 @@ void removeFriendFromArray(char *name) {
 
 void replaceUsername(char *name, char *prevName) {
     FILE *file, *tempFile; 
-	if  ((file = openFile("users.csv", "r+")) == NULL) return;
+	if  ((file = openFile(usersFilePath, "r+")) == NULL) return;
 	if  ((tempFile = openFile("tempUsers.csv", "a")) == NULL) return;
 
     char pass[NAME_LEN];
@@ -296,8 +302,8 @@ void replaceUsername(char *name, char *prevName) {
 
 	if (found) {
 		writeUserToFile("tempUsers.csv", name, pass);
-		remove("users.csv");
-		rename("tempUsers.csv", "users.csv");
+		remove(usersFilePath);
+		rename("tempUsers.csv", usersFilePath);
 		printf("Username successfully changed.\n\n");	
     } else {
         remove("tempUsers.csv");
@@ -306,7 +312,7 @@ void replaceUsername(char *name, char *prevName) {
 
 void updateStatus(char *name) {
 	FILE *file, *tempFile;
-    if  ((file = openFile("users.csv", "r+")) == NULL) return;
+    if  ((file = openFile(usersFilePath, "r+")) == NULL) return;
     if  ((tempFile = openFile("tempUsers.csv", "a")) == NULL) return;	
 	
 	int found = 0;
@@ -329,8 +335,8 @@ void updateStatus(char *name) {
 
     if (found) {
 		writeUserToFile("tempUsers.csv", name, pass);
-		remove("users.csv");
-        rename("tempUsers.csv", "users.csv");
+		remove(usersFilePath);
+        rename("tempUsers.csv", usersFilePath);
     } else {
         remove("tempUsers.csv");
     }
@@ -338,7 +344,7 @@ void updateStatus(char *name) {
 
 void updateUsersArray(void) {
 	FILE *file;
-	if  ((file = openFile("users.csv", "r+")) == NULL) return;
+	if  ((file = openFile(usersFilePath, "r+")) == NULL) return;
 
 	int i = 0;
 	fscanf(file, "%*[^\n]\n");

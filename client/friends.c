@@ -194,11 +194,9 @@ void addFriend(void) {
 				bool userExists = false;
 			 	for (int i = 0; i < numberOfUsers; i++) {
                     if (strcmp(users[i].username, nameOfFriend) == 0) {
-						SRM data;
+						SR data;
 						strcpy(data.SenderName, myName);
 						strcpy(data.ReceiverName, nameOfFriend);
-						snprintf(message, sizeof(message), "%s wants to be your friend.", myName);
-						strcpy(data.Message, message);
 						serializeMessage(SendFriendRequest, &data);
 						userExists = true;
                         return;
