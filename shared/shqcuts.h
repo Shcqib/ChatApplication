@@ -3,11 +3,16 @@
 #ifndef SHQCUTS_H
 #define SHQCUTS_H
 
+#define dataPath "data/"                                                                                  
+#define usersFilePath dataPath "users.csv" 
+#define friendsFilePath dataPath "friends.csv" 
+#define friendReqFilePath dataPath "friendReq.csv"
+
 #define MAX_LINE_LENGTH 256
 #define MAX_GROUPS 2
 #define MAX_MEMBERS 5
 
-#define MAX_TYPES 10
+#define MAX_TYPES 20
 #define MAX_USERS 5
 #define MAX_FRIENDS 5
 #define MSG_LEN 256
@@ -80,6 +85,8 @@ typedef enum {
     SendMessageRequest = 3,
 	AddFriendRequest = 4,
 	RemoveFriendRequest = 5,
+	RegisterUserRequest = 6,
+	LoginUserRequest = 7,
 } MessageType;
 
 typedef struct {

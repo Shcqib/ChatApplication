@@ -23,4 +23,6 @@ void registerAllTypes() {
     registerType(SendMessageRequest, sizeof(SRM));
 	registerType(AddFriendRequest, sizeof(SR));
 	registerType(RemoveFriendRequest, sizeof(SR));
+	registerType(RegisterUserRequest, sizeof(S));
+	registerType(LoginUserRequest, sizeof(S));
 }

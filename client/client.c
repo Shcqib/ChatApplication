@@ -131,7 +131,8 @@ void login(void) {
        	    if (isValidPass(myPass)) {
 				for (int i = 0; i < numberOfUsers; i++) {
               		if (strcmp(users[i].username, myName) == 0 && strcmp(users[i].password, myPass) == 0) {
-	           			printf("Welcome back %s\n\n", myName);
+						S data = form_s_struct(myName);
+						serializeMessage(LoginUserRequest, &data);
 						active = true;
 						updateStatus(myName);
 						updateUsersArray();
@@ -161,6 +162,8 @@ void registerUser(void) {
 				while (1) {
 					printf("What would you like your password to be?\n");
 					if (isValidPass(myPass)) {
+						S data = form_s_struct(myName);
+						serializeMessage(RegisterUserRequest, &data);
         				printf("Welcome %s\n\n", myName);
 						active = true;
 						writeUserToFile("users.csv", myName, myPass);

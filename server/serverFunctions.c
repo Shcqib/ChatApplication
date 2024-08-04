@@ -11,9 +11,8 @@
 
 #define MAX_LINE_LENGTH 256
 
-char name[NAME_LEN], recipientName[NAME_LEN], messageToSend[256];
+char message[MSG_LEN];
 void getName(char *buffer, char *name);
-void sendClientMessageThroughSocket(int clientfd, int recipientClient);
 void getRecipientName(char *buffer, char *name);
 
 void allClients() {
@@ -42,16 +41,6 @@ void addClient(char *username, int clientfd) {
 	}
 }
 
-FILE *openFile(char *filename, char *format) {
-    FILE *file = fopen(filename, format);
-    if (file == NULL) {
-        perror("Failed to open file");
-        return NULL;
-    }
-
-    return file;
-}
-
 void sendClientMessage(char *buffer, int clientfd) {
     int bytes_sent = send(clientfd, buffer, strlen(buffer) + 1, 0);
 	if (bytes_sent < 0) {
@@ -63,25 +52,25 @@ void sendClientMessage(char *buffer, int clientfd) {
     }
 }
 
-void sendFriendRequest(char *namet, char *recipientNamet, int clientfd) {
+void sendFriendRequest(char *name, char *recipientName, int clientfd) {
 	for (int i = 0; i < MAX_CLIENTS; i++) {                                                                                  
-		if (strcmp(recipientNamet, clients[i].username) == 0) {                                                              
-			snprintf(messageToSend, sizeof(messageToSend), "You have sent %s a friend request.", recipientNamet);
+		if (strcmp(recipientName, clients[i].username) == 0) {                                                              
+			snprintf(messageToSend, sizeof(messageToSend), "You have sent %s a friend request.", recipientName);
 			sendClientMessage(messageToSend, clientfd);
-			snprintf(messageToSend, sizeof(messageToSend), "%s sent you a friend request.", namet);
+			snprintf(messageToSend, sizeof(messageToSend), "%s sent you a friend request.", name);
 			sendClientMessage(messageToSend, clients[i].clientfd);
-			writeFriendToFile("data/friendReq.csv", recipientNamet, namet);
+			writeFriendToFile("data/friendReq.csv", recipientName, name);
 			return;
 		}                                                                                                                     
     }  
 }
 
-void acceptFriendRequest(char *namet, char *recipientNamet, int clientfd) {
+void acceptFriendRequest(char *name, char *recipientName, int clientfd) {
 	for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (strcmp(recipientNamet, clients[i].username) == 0) {
-			snprintf(messageToSend, sizeof(messageToSend), "You and %s are now friends.\n\n", namet);
+        if (strcmp(recipientName, clients[i].username) == 0) {
+			snprintf(messageToSend, sizeof(messageToSend), "You and %s are now friends.\n\n", name);
 			sendClientMessage(messageToSend, clients[i].clientfd);
-			acceptFReq(recipientName, namet);
+			acceptFReq(recipientName, name);
 			break;
         }
     }
@@ -89,21 +78,21 @@ void acceptFriendRequest(char *namet, char *recipientNamet, int clientfd) {
 
 	snprintf(messageToSend, sizeof(messageToSend), "You and %s are now friends.\n\n", recipientName);
 	sendClientMessage(messageToSend, clientfd);
-	acceptFReq(namet, recipientName);
+	acceptFReq(name, recipientName);
 }
 
 
-void removeFriendRequest(char *namet, char *recipientNamet, int clientfd) {
+void removeFriendRequest(char *name, char *recipientName, int clientfd) {
 	for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (strcmp(recipientNamet, clients[i].username) == 0) {
-			snprintf(messageToSend, sizeof(messageToSend), "%s declined your friend request.\n\n", namet);
+        if (strcmp(recipientName, clients[i].username) == 0) {
+			snprintf(messageToSend, sizeof(messageToSend), "%s declined your friend request.\n\n", name);
 			sendClientMessage(messageToSend, clients[i].clientfd);
 			break;
         }
     }
-			snprintf(messageToSend, sizeof(messageToSend), "You declined %s friend request.\n\n", recipientNamet);
+			snprintf(messageToSend, sizeof(messageToSend), "You declined %s friend request.\n\n", recipientName);
 			sendClientMessage(messageToSend, clientfd);
-			removeFReq(namet, recipientNamet);
+			removeFReq(name, recipientName);
 }
 
 void sendFriendMessage(char *buffer, int clientfd) {
@@ -141,10 +130,20 @@ void deserializeMessage(unsigned char *buffer, int clientfd) {
 		case AddFriendRequest: {
 			SR *sr = (SR *)data;
 			acceptFriendRequest(sr->SenderName, sr->ReceiverName, clientfd);	
+			break;
 		}
 		case RemoveFriendRequest: {
 			SR *sr = (SR *)data;
 			removeFriendRequest(sr->SenderName, sr->ReceiverName, clientfd);	
+			break;
+		}
+		case RegisterUserRequest: {
+			S *s = (S *)data;
+			registerUserRequest(s->SenderName, clientfd);
+		}
+		case LoginUserRequest: {
+			S *s = (S *)data;
+			loginUserRequest(s->SenderName, clientfd);
 		}
         case SendMessageRequest: {
             break;
@@ -161,81 +160,3 @@ void handleCommand(unsigned char *buffer, int clientfd) {
 	deserializeMessage(buffer, clientfd);
 }
 
-   // if (strcmp(firstWord, "CONNECT") == 0) {
-  //      addClient(buffer, clientfd);
-//	} else if (strcmp(firstWord, "FRIENDREQUEST") == 0) {
-//		sendFriendRequest(buffer, clientfd);	
-//	} else if (strcmp(firstWord, "DECLINEFRIENDREQ") == 0) {
-//		sendDeclineMsg(buffer, clientfd);
-//	} else if (strcmp(firstWord, "ACCEPTFRIENDREQ") == 0) {
-//		sendAcceptMsg(buffer, clientfd);
-//	} else if (strcmp(firstWord, "MESSAGE") == 0 ) {
-//		sendFriendMessage(buffer, clientfd);
-//	}
-
-void getRecipientName(char *buffer, char *name) {
-	char *firstSpacePosition, *secondSpacePosition, *thirdSpacePosition;
-
-    firstSpacePosition = strchr(buffer, ' ');
-    if (firstSpacePosition == NULL) {
-        return; 
-    }
-
-    char *secondWordStart = firstSpacePosition + 1;
-    secondSpacePosition = strchr(secondWordStart, ' ');
-    if (secondSpacePosition == NULL) {
-        return; 
-    }
-
-    char *thirdWordStart = secondSpacePosition + 1;
-    thirdSpacePosition = strchr(thirdWordStart, ' ');
-
-    if (thirdSpacePosition != NULL) {
-        int lengthToCopy = thirdSpacePosition - thirdWordStart;
-        strncpy(name, thirdWordStart, lengthToCopy);
-        name[lengthToCopy] = '\0';
-    } else {
-        strcpy(name, thirdWordStart);
-    }
-}
-
-void getName(char *buffer, char *name) {
-    char *firstSpacePosition, *secondSpacePosition;
-
-    firstSpacePosition = strchr(buffer, ' ');
-
-    if (firstSpacePosition != NULL) {
-        char *secondWordStart = firstSpacePosition + 1;
-
-        secondSpacePosition = strchr(secondWordStart, ' ');
-
-        if (secondSpacePosition != NULL) {
-            int lengthToCopy = secondSpacePosition - secondWordStart;
-            strncpy(name, secondWordStart, lengthToCopy);
-            name[lengthToCopy] = '\0';
-        } else {
-            strcpy(name, secondWordStart);
-        }
-	}
-}
-
-void getExtraInfo(char *buffer, char *message) {
-	char *firstSpacePosition, *secondSpacePosition, *thirdSpacePosition, *fourthWordStart;
-
-    firstSpacePosition = strchr(buffer, ' ');
-
-    if (firstSpacePosition != NULL) {
-        char *secondWordStart = firstSpacePosition + 1;
-        secondSpacePosition = strchr(secondWordStart, ' ');
-
-        if (secondSpacePosition != NULL) {
-            char *thirdWordStart = secondSpacePosition + 1;
-            thirdSpacePosition = strchr(thirdWordStart, ' ');
-
-            if (thirdSpacePosition != NULL) {
-                fourthWordStart = thirdSpacePosition + 1;
-                strcpy(message, fourthWordStart);
-            }
-		}
-	}
-}

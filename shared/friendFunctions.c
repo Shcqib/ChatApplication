@@ -9,10 +9,6 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-#define dataPath "data/"
-#define friendsFilePath dataPath "friends.csv" 
-#define friendReqFilePath dataPath "friendReq.csv"
-
 void removeFReq(char *name, char *friendName);
 void clearArrays();
 
