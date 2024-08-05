@@ -9,14 +9,18 @@
 void registerUserRequest(char *name, int clientfd) {
 	snprintf(messageToSend , sizeof(messageToSend), "Welcome %s", name);
 	sendClientMessage(messageToSend, clientfd);
+	active = true;
+	writeUserToFile(usersFilePath, name);
 }
 
 void loginUserRequest(char *name, int clientfd) {
 	snprintf(messageToSend , sizeof(messageToSend), "Welcome %s", name);
 	sendClientMessage(messageToSend, clientfd);
+	active = true;
+	updateStatus(name, active);
 }
 
-void writeUserToFile(char *filename, char *name, char *pass) {
+void writeUserToFile(char *filename, char *name, char *pass, bool status) {
     FILE *file;
     if ((file = openFile(filename, "a")) == NULL) return;
 
@@ -27,7 +31,7 @@ void writeUserToFile(char *filename, char *name, char *pass) {
 
     fseek(file, 0, SEEK_SET);
 
-    if (active) {
+    if (status) {
         fprintf(file, "%s,%s,Online\n", name, pass);
     } else {
         fprintf(file, "%s,%s,Offline\n", name, pass);
@@ -39,7 +43,7 @@ void writeUserToFile(char *filename, char *name, char *pass) {
     initializeFile("data/friendReq.csv", name);
 }
 
-void updateStatus(char *name) {
+void updateStatus(char *name, bool status) {
     FILE *file, *tempFile;
     if  ((file = openFile(usersFilePath, "r+")) == NULL) return;
     if  ((tempFile = openFile("tempUsers.csv", "a")) == NULL) return;
@@ -63,7 +67,7 @@ void updateStatus(char *name) {
     fclose(tempFile);
 
     if (found) {
-        writeUserToFile("tempUsers.csv", name, pass);
+        writeUserToFile("tempUsers.csv", name, pass, bool status);
         remove(usersFilePath);
         rename("tempUsers.csv", usersFilePath);
     } else {

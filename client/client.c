@@ -162,7 +162,7 @@ void registerUser(void) {
 				while (1) {
 					printf("What would you like your password to be?\n");
 					if (isValidPass(myPass)) {
-						S data = form_s_struct(myName);
+						registrationData data = form_s_struct(myName);
 						serializeMessage(RegisterUserRequest, &data);
         				printf("Welcome %s\n\n", myName);
 						active = true;
