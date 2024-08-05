@@ -90,8 +90,8 @@ int menu(void) {
                 break;
             case 5:
                 printf("Goodbye!\n");
-				active = false;
-				updateStatus(myName);
+				S data = form_s_struct(myName);
+				serializeMessage(ClientDisconnect, &data);
 				updateUsersArray();
                 exit(0);
             default:
@@ -133,8 +133,6 @@ void login(void) {
               		if (strcmp(users[i].username, myName) == 0 && strcmp(users[i].password, myPass) == 0) {
 						S data = form_s_struct(myName);
 						serializeMessage(LoginUserRequest, &data);
-						active = true;
-						updateStatus(myName);
 						updateUsersArray();
                     	return;	
 					}
@@ -162,11 +160,9 @@ void registerUser(void) {
 				while (1) {
 					printf("What would you like your password to be?\n");
 					if (isValidPass(myPass)) {
-						registrationData data = form_s_struct(myName);
+						registrationData data = form_register_struct(myName, myPass);
 						serializeMessage(RegisterUserRequest, &data);
         				printf("Welcome %s\n\n", myName);
-						active = true;
-						writeUserToFile("users.csv", myName, myPass);
 						updateUsersArray();
 						return;
    					} 

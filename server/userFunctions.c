@@ -10,7 +10,7 @@ void registerUserRequest(char *name, int clientfd) {
 	snprintf(messageToSend , sizeof(messageToSend), "Welcome %s", name);
 	sendClientMessage(messageToSend, clientfd);
 	active = true;
-	writeUserToFile(usersFilePath, name);
+	writeUserToFile(usersFilePath, name, pass, active);
 }
 
 void loginUserRequest(char *name, int clientfd) {

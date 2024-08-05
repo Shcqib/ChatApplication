@@ -20,7 +20,7 @@
 #define BUFFER_SIZE 1024
 
 void writeGroupToFile(char *groupName);
-void updateStatus(char *name);
+void updateStatus(char *name, bool status);
 int main(void);
 void initializeGroupFile(char *username);
 void initializeFile(char *filename, const char *username);
@@ -40,7 +40,7 @@ void writeGroupMemberToFile(char *groupName, char *name);
 void removeMember(char *name, char *filename);
 void updateFReq(char *name);
 void writeToFile(char *filename, char *name);
-void writeUserToFile(char *filename, char *name, char *pass);
+void writeUserToFile(char *filename, char *name, char *pass, bool status);
 void updateUsersArray(void);
 void registerType(int typeIndex, size_t dataSize);
 void registerAllTypes();
@@ -87,6 +87,7 @@ typedef enum {
 	RemoveFriendRequest = 5,
 	RegisterUserRequest = 6,
 	LoginUserRequest = 7,
+	ClientDisconnect = 8,
 } MessageType;
 
 typedef struct {
@@ -106,7 +107,6 @@ typedef struct {
     char groupName[NAME_LEN];
     Member members[MAX_MEMBERS];
     int amountOfMembers;
-   
 } Group;
 
 Group groups[MAX_GROUPS];
@@ -132,6 +132,11 @@ typedef struct {
 	char ReceiverName[NAME_LEN];
 } SR;
 
+typedef struct {
+	char SenderName[NAME_LEN];
+	char SenderPass[NAME_LEN];
+} registrationData;
+
 extern int numberOfUsers;
 User users[MAX_USERS];
 
@@ -141,6 +146,7 @@ int searchPassword(char *pass, char *name);
 SR form_sr_struct(char *senderName, char *receiverName);
 S form_s_struct(char *senderName);
 SRM form_srm_struct(char *senderName, char *receiverName, char *message);
+registrationData form_register_struct(char *senderName, char *senderPass);
 
 #endif
 

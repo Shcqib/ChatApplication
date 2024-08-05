@@ -110,6 +110,11 @@ void sendFriendMessage(char *buffer, int clientfd) {
     sendClientMessage(messageToSend, clientfd);
 }
 
+void clientDisconnection(char *name, clientfd) {
+	active = false;
+	updateStatus(name, active);
+}
+
 void deserializeMessage(unsigned char *buffer, int clientfd) {
     MessageType type = buffer[0];
 	size_t dataSize = (size_t)buffer[1];
@@ -144,6 +149,10 @@ void deserializeMessage(unsigned char *buffer, int clientfd) {
 		case LoginUserRequest: {
 			S *s = (S *)data;
 			loginUserRequest(s->SenderName, clientfd);
+		}
+		case ClientDisconnect: {
+			S *s = (S *)data;
+			clientDisconnection(s->SenderName, clientfd);
 		}
         case SendMessageRequest: {
             break;

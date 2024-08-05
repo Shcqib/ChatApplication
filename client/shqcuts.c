@@ -61,6 +61,13 @@ SRM form_srm_struct(char *senderName, char *receiverName, char *message) {
 	return srm;
 }
 
+registrationData form_register_struct(char *senderName, char *senderPass) {
+	SR data;
+	strcpy(data.SenderName, senderName);	
+	strcpy(data.SenderPass, senderPass);
+	return data;
+}
+
 void sendMessage(char *t) {
 
 }
