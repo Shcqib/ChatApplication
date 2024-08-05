@@ -5,7 +5,6 @@
 #include <stdbool.h>
 
 char myPass[NAME_LEN];
-bool active;
 
 int start(void);
 void registerUser(void);

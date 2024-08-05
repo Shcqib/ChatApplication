@@ -36,8 +36,8 @@ void settingsMenu(void) {
 }
 
 void logOut() {
-	active = false;
-	updateStatus(myName);
+	S data = form_s_struct(myName);
+	serializeMessage(ClientDisconnect, &data);
 	updateUsersArray();
 	main();
 }

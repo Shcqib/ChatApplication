@@ -4,8 +4,19 @@
 #include "shqcuts.h"
 
 char myName[NAME_LEN];
+bool active;
 
 int typeCount = 0;
+
+FILE *openFile(char *filename, char *format) {
+    FILE *file = fopen(filename, format);
+    if (file == NULL) {
+        perror("Failed to open file");
+        return NULL;
+    }
+
+    return file;
+}
 
 void registerType(int typeIndex, size_t dataSize) {
     printf("Registering type %d\n", typeIndex);

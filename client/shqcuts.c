@@ -62,7 +62,7 @@ SRM form_srm_struct(char *senderName, char *receiverName, char *message) {
 }
 
 registrationData form_register_struct(char *senderName, char *senderPass) {
-	SR data;
+	registrationData data;
 	strcpy(data.SenderName, senderName);	
 	strcpy(data.SenderPass, senderPass);
 	return data;
@@ -147,16 +147,6 @@ int isValidPass(char *pass) {
     return 1;
 }
 
-FILE *openFile(char *filename, char *format) {
-	FILE *file = fopen(filename, format);
-    if (file == NULL) {
-        perror("Failed to open file");
-        return NULL;
-    }
-
-	return file;
-}
-
 void replacePassword(char *name, char *pass) {
 	FILE *file, *tempFile;
 	if  ((file = openFile(usersFilePath, "r")) == NULL) return;
@@ -178,7 +168,7 @@ void replacePassword(char *name, char *pass) {
     fclose(tempFile);
 
     if (found) {
-        writeUserToFile("tempUsers.csv",	name, pass);
+  //      writeUserToFile("tempUsers.csv", name, pass, active);
         remove(usersFilePath);
         rename("tempUsers.csv", usersFilePath);
         printf("Password successfully changed.\n\n");
@@ -302,7 +292,7 @@ void replaceUsername(char *name, char *prevName) {
 	fclose(tempFile);	
 
 	if (found) {
-		writeUserToFile("tempUsers.csv", name, pass);
+//		writeUserToFile("tempUsers.csv", name, pass, active);
 		remove(usersFilePath);
 		rename("tempUsers.csv", usersFilePath);
 		printf("Username successfully changed.\n\n");	

@@ -3,10 +3,13 @@
 #include <pthread.h>
 #include <ctype.h>
 #include <string.h>
+#include "serverFunctions.h"
 #include "shqcuts.h"
 #include <stdbool.h>
 
-void registerUserRequest(char *name, int clientfd) {
+char nameInFile[NAME_LEN], passInFile[NAME_LEN], statusInFile[NAME_LEN];
+
+void registerUserRequest(char *name, char *pass, int clientfd) {
 	snprintf(messageToSend , sizeof(messageToSend), "Welcome %s", name);
 	sendClientMessage(messageToSend, clientfd);
 	active = true;
@@ -67,7 +70,7 @@ void updateStatus(char *name, bool status) {
     fclose(tempFile);
 
     if (found) {
-        writeUserToFile("tempUsers.csv", name, pass, bool status);
+        writeUserToFile("tempUsers.csv", name, pass, status);
         remove(usersFilePath);
         rename("tempUsers.csv", usersFilePath);
     } else {

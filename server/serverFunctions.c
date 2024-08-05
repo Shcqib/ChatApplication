@@ -96,21 +96,9 @@ void removeFriendRequest(char *name, char *recipientName, int clientfd) {
 }
 
 void sendFriendMessage(char *buffer, int clientfd) {
-	getRecipientName(buffer, recipientName);
-    getName(buffer, name);
-
-    for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (strcmp(recipientName, clients[i].username) == 0) {
-            snprintf(messageToSend, sizeof(messageToSend), "%s -> You) \n\n", name);
-            sendClientMessage(messageToSend, clients[i].clientfd);
-        }
-    }
-
-    snprintf(messageToSend, sizeof(messageToSend), "Me -> %s\n\n", recipientName);
-    sendClientMessage(messageToSend, clientfd);
 }
 
-void clientDisconnection(char *name, clientfd) {
+void clientDisconnection(char *name, int clientfd) {
 	active = false;
 	updateStatus(name, active);
 }
@@ -143,8 +131,8 @@ void deserializeMessage(unsigned char *buffer, int clientfd) {
 			break;
 		}
 		case RegisterUserRequest: {
-			S *s = (S *)data;
-			registerUserRequest(s->SenderName, clientfd);
+			registrationData *regData = (registrationData *)data;
+			registerUserRequest(regData->SenderName, regData->SenderPass, clientfd);
 		}
 		case LoginUserRequest: {
 			S *s = (S *)data;
