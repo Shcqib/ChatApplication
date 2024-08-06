@@ -95,7 +95,8 @@ void switchUsername() {
     		} else {
     	    	for (int i = 0; i < numberOfUsers; i++) {
 	            	if (strcmp(users[i].username, prevName) == 0) {
-                		replaceUsername(myName, prevName);
+						ReplaceUsernameData data = form_replaceUser_struct(myName, prevName);
+						serializeMessage(ReplaceUsernameRequest, &data);
 						updateUsersArray();
 						break;
             		}
@@ -117,7 +118,8 @@ void switchPassword() {
 				if (isValidPass(myPass)) {
 					for (int i = 0; i < numberOfUsers; i++) {
             			if (strcmp(users[i].username, myName) == 0 && strcmp(users[i].password, prevPass) == 0) {
-                			replacePassword(myName, myPass);
+							SP *data = form_sp_struct(myName, myPass);
+							serializeMessage(ReplacePasswordRequest, &data);
 							updateUsersArray();
 							break;
         				}						

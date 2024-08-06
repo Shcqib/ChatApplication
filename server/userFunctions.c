@@ -79,3 +79,68 @@ void updateStatus(char *name, bool status) {
         remove("tempUsers.csv");
     }
 }
+
+void replaceUsername(char *name, char *prevName) {
+    FILE *file, *tempFile;
+    if  ((file = openFile(usersFilePath, "r+")) == NULL) return;
+    if  ((tempFile = openFile("tempUsers.csv", "a")) == NULL) return;
+
+    char pass[NAME_LEN];
+    int found = 0;
+
+    fprintf(tempFile, "username,password,status\n");
+    fscanf(file, "%*[^\n]\n");
+
+    while (fscanf(file, "%[^,],%[^,],%[^\n]\n", nameInFile, passInFile, statusInFile) != EOF) {
+        if (strcmp(nameInFile, prevName) == 0) {
+            strcpy(pass, passInFile);
+            found = 1;
+        } else {
+            fprintf(tempFile, "%s,%s,%s\n", nameInFile, passInFile, statusInFile);
+        }
+    }
+
+    fclose(file);
+    fclose(tempFile);
+
+    if (found) {
+		active = true;
+        writeUserToFile("tempUsers.csv", name, pass, active);
+        remove(usersFilePath);
+        rename("tempUsers.csv", usersFilePath);
+        printf("Username successfully changed.\n\n");
+    } else {
+        remove("tempUsers.csv");
+    }
+}
+
+void replacePassword(char *name, char *pass) {
+    FILE *file, *tempFile;
+    if  ((file = openFile(usersFilePath, "r")) == NULL) return;
+    if  ((tempFile = openFile("tempUsers.csv", "a")) == NULL) return;
+
+    int found = 0;
+    fprintf(tempFile, "username,password,status\n");
+    fscanf(file, "%*[^\n]\n");
+
+    while (fscanf(file, "%[^,],%[^,],%[^\n]\n", nameInFile, passInFile, statusInFile) != EOF) {
+        if (strcmp(nameInFile, name) == 0) {
+            found = 1;
+        } else {
+            fprintf(tempFile, "%s,%s,%s\n", nameInFile, passInFile, statusInFile);
+        }
+    }
+
+    fclose(file);
+    fclose(tempFile);
+
+    if (found) {
+		active = true;
+        writeUserToFile("tempUsers.csv", name, pass, active);
+        remove(usersFilePath);
+        rename("tempUsers.csv", usersFilePath);
+        printf("Password successfully changed.\n\n");
+    } else {
+        remove("tempUsers.csv");
+    }
+}

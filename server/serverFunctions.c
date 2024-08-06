@@ -126,7 +126,7 @@ void deserializeMessage(unsigned char *buffer, int clientfd) {
 			break;
 		}
 		case RegisterUserRequest: {
-			SP *sp = (registrationData *)data;
+			SP *sp = (SP *)data;
 			addClient(sp->SenderName, clientfd);
 			registerUserRequest(sp->SenderName, sp->SenderPass, clientfd);
 			break;
@@ -140,6 +140,16 @@ void deserializeMessage(unsigned char *buffer, int clientfd) {
 		case ClientDisconnect: {
 			S *s = (S *)data;
 			clientDisconnection(s->SenderName, clientfd);
+			break;
+		}
+		case ReplaceUsernameRequest: {
+			ReplaceUsernameData *data_ = (ReplaceUsernameData *)data;
+			replaceUsername(data_->SenderName, data_->PreviousName);
+			break;
+		}
+		case ReplacePasswordRequest: {
+			SP *sp = (SP *)data;
+			replacePassword(sp->SenderName, sp->SenderPass);
 			break;
 		}
         case SendMessageRequest: {
