@@ -110,11 +110,6 @@ void deserializeMessage(unsigned char *buffer, int clientfd) {
 	memcpy(data, buffer + 2, dataSize);
 
     switch (type) {
-		case Connect: {
-			S *s = (S *)data;
-			addClient(s->SenderName, clientfd);
-			break;
-		}
         case SendFriendRequest: {
 			SR *sr = (SR *)data;
 			sendFriendRequest(sr->SenderName, sr->ReceiverName, clientfd);	
@@ -132,15 +127,20 @@ void deserializeMessage(unsigned char *buffer, int clientfd) {
 		}
 		case RegisterUserRequest: {
 			registrationData *regData = (registrationData *)data;
+			addClient(regData->SenderName, clientfd);
 			registerUserRequest(regData->SenderName, regData->SenderPass, clientfd);
+			break;
 		}
 		case LoginUserRequest: {
 			S *s = (S *)data;
+			addClient(s->SenderName, clientfd);
 			loginUserRequest(s->SenderName, clientfd);
+			break;
 		}
 		case ClientDisconnect: {
 			S *s = (S *)data;
 			clientDisconnection(s->SenderName, clientfd);
+			break;
 		}
         case SendMessageRequest: {
             break;

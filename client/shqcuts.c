@@ -27,10 +27,7 @@ void clientSocket() {
         .sin_addr.s_addr = inet_addr("127.0.0.1")
     };                                                                                                                                                                                                                
                                                                                                                                                                                                                       
-    if (connect(sockfd, (struct sockaddr *)&address, sizeof(address)) == 0) {
-		S data = form_s_struct(myName);
-		serializeMessage(Connect, &data);
-	}		
+    connect(sockfd, (struct sockaddr *)&address, sizeof(address));
 
 	pthread_t recv_thread;
 	if (pthread_create(&recv_thread, NULL, receiveMessageFromServer, NULL) != 0) {

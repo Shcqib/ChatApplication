@@ -6,7 +6,7 @@
 
 char myPass[NAME_LEN];
 
-int start(void);
+void start(void);
 void registerUser(void);
 void login(void);
 int menu(void);
@@ -26,18 +26,18 @@ int main(void) {
 		printf("status %d = %s\n", i, users[i].status); 	
 		printf("\n"); 
 	}
+	clientSocket();
 	start();
 	updateFriendArray(myName);
 	updateFReq(myName);
-	clientSocket();
 	menu();
 	return 0;
 }
 
 
 
-int start(void) {
-    while (1) {
+void start(void) {
+    while (true) {
         printf("1) Login\n");
         printf("2) Register\n");
         
@@ -46,19 +46,17 @@ int start(void) {
         switch (choice)	{
 			case 1: 
 				login();
-				return 0;
-				break;
+				return;
 			case 2:
 				registerUser();
-				return 0;
-				break;
+				return;
  			default:
 				printf("Invalid choice. Please press 1 or 2.\n\n");
 				break;
 		}
 	}
 
-    return 0;
+    return;
 }
 
 int menu(void) {
@@ -132,6 +130,7 @@ void login(void) {
               		if (strcmp(users[i].username, myName) == 0 && strcmp(users[i].password, myPass) == 0) {
 						S data = form_s_struct(myName);
 						serializeMessage(LoginUserRequest, &data);
+						printf("sent server login data\n");
 						updateUsersArray();
                     	return;	
 					}

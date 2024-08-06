@@ -17,6 +17,7 @@ void registerUserRequest(char *name, char *pass, int clientfd) {
 }
 
 void loginUserRequest(char *name, int clientfd) {
+	printf("calling loginUserRequest\n");
 	snprintf(messageToSend , sizeof(messageToSend), "Welcome %s", name);
 	sendClientMessage(messageToSend, clientfd);
 	active = true;
@@ -70,6 +71,7 @@ void updateStatus(char *name, bool status) {
     fclose(tempFile);
 
     if (found) {
+		printf("writing %s to file %s with pass %s\n", name, "tempUsers.csv", pass);
         writeUserToFile("tempUsers.csv", name, pass, status);
         remove(usersFilePath);
         rename("tempUsers.csv", usersFilePath);
