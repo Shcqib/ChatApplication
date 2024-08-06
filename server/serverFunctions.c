@@ -152,6 +152,14 @@ void deserializeMessage(unsigned char *buffer, int clientfd) {
 			replacePassword(sp->SenderName, sp->SenderPass);
 			break;
 		}
+		case RemoveFriend: {
+			break;
+		}
+		case DeactivateAccountRequest: {
+			S *s = (S *)data;
+			removeUser(s->SenderName);
+			break;
+		}
         case SendMessageRequest: {
             break;
         }

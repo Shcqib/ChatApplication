@@ -161,7 +161,6 @@ void removeFriend(void) {
 			int found = 0;
 			for (int i = 0; i < numberOfFriends; i++) {
 				if (strcmp(nameOfFriend, friendList[i]) == 0) {
-					removeFriendFromArray(nameOfFriend);
 					printf("%s is no longer your friend.\n\n", nameOfFriend);
 					return;
 				}

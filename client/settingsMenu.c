@@ -55,7 +55,6 @@ void account(void) {
 				details();
 				break;
 			case 2:
-				printf("Deactivating account...\n\n");
 				deactivateAcc();
 				break;
 			case 3:
@@ -76,7 +75,9 @@ void deactivateAcc() {
 	promptUserForInput("%d", &choice);
 
 	if (choice == 1) {
-		removeUser(myName);
+		S data = form_s_struct(myName);
+		serializeMessage(DeactivateAccountRequest, &data);
+		printf("Deactivating account...\n\n");
 		logOut();
 	} else if (choice == 2) {
 		account();
@@ -118,7 +119,7 @@ void switchPassword() {
 				if (isValidPass(myPass)) {
 					for (int i = 0; i < numberOfUsers; i++) {
             			if (strcmp(users[i].username, myName) == 0 && strcmp(users[i].password, prevPass) == 0) {
-							SP *data = form_sp_struct(myName, myPass);
+							SP data = form_sp_struct(myName, myPass);
 							serializeMessage(ReplacePasswordRequest, &data);
 							updateUsersArray();
 							break;

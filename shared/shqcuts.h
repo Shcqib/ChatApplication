@@ -90,6 +90,8 @@ typedef enum {
 	ClientDisconnect = 8,
 	ReplaceUsernameRequest = 9,
 	ReplacePasswordRequest = 10,
+	DeactivateAccountRequest = 11,
+	RemoveFriend = 12,
 } MessageType;
 
 typedef struct {
@@ -154,6 +156,7 @@ SR form_sr_struct(char *senderName, char *receiverName);
 S form_s_struct(char *senderName);
 SRM form_srm_struct(char *senderName, char *receiverName, char *message);
 SP form_sp_struct(char *senderName, char *senderPass);
+ReplaceUsernameData form_replaceUser_struct(char *senderName, char *previousName);
 
 #endif
 

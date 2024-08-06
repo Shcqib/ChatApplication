@@ -144,3 +144,32 @@ void replacePassword(char *name, char *pass) {
         remove("tempUsers.csv");
     }
 }
+
+void removeUser(char *name) {
+    FILE *file, *tempFile;
+    if  ((file = openFile(usersFilePath, "r")) == NULL) return;
+    if  ((tempFile = openFile("tempUsers.csv", "a")) == NULL) return;
+
+    int found = 0;
+    fprintf(tempFile, "username,password,status\n");
+    fscanf(file, "%*[^\n]\n");
+
+    while (fscanf(file, "%[^,],%[^,],%[^\n]\n", nameInFile, passInFile, statusInFile) != EOF) {
+        if (strcmp(nameInFile, name) == 0) {
+            found = 1;
+        } else {
+            fprintf(tempFile, "%s,%s,%s\n", nameInFile, passInFile, statusInFile);
+        }
+    }
+
+    fclose(file);
+    fclose(tempFile);
+
+    if (found) {
+        remove(usersFilePath);
+        rename("tempUsers.csv", usersFilePath);
+    } else {
+        remove("tempUsers.csv");
+    }
+}
+

@@ -19,12 +19,10 @@ FILE *openFile(char *filename, char *format) {
 }
 
 void registerType(int typeIndex, size_t dataSize) {
-    printf("Registering type %d\n", typeIndex);
     if (typeCount < MAX_TYPES) {
         typeRegistry[typeCount].typeIndex = typeIndex;
         typeRegistry[typeCount].size = dataSize;
         typeCount++;
-        printf("Type count %d\n", typeCount);
     }
 }
 
@@ -38,5 +36,7 @@ void registerAllTypes() {
 	registerType(LoginUserRequest, sizeof(S));
 	registerType(ClientDisconnect, sizeof(S));
 	registerType(ReplaceUsernameRequest, sizeof(ReplaceUsernameData));
-	registerTpye(ReplacePasswordRequest, sizeof(SP));
+	registerType(ReplacePasswordRequest, sizeof(SP));
+	registerType(DeactivateAccountRequest, sizeof(S));
+	registerType(RemoveFriend, sizeof(SR));
 }
