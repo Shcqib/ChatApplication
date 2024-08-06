@@ -34,7 +34,9 @@ void registerAllTypes() {
     registerType(SendMessageRequest, sizeof(SRM));
 	registerType(AddFriendRequest, sizeof(SR));
 	registerType(RemoveFriendRequest, sizeof(SR));
-	registerType(RegisterUserRequest, sizeof(registrationData));
+	registerType(RegisterUserRequest, sizeof(SP));
 	registerType(LoginUserRequest, sizeof(S));
 	registerType(ClientDisconnect, sizeof(S));
+	registerType(ReplaceUsernameRequest, sizeof(ReplaceUsernameData));
+	registerTpye(ReplacePasswordRequest, sizeof(SP));
 }

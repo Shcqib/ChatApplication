@@ -88,6 +88,8 @@ typedef enum {
 	RegisterUserRequest = 6,
 	LoginUserRequest = 7,
 	ClientDisconnect = 8,
+	ReplaceUsernameRequest = 9,
+	ReplacePasswordRequest = 10,
 } MessageType;
 
 typedef struct {
@@ -135,7 +137,12 @@ typedef struct {
 typedef struct {
 	char SenderName[NAME_LEN];
 	char SenderPass[NAME_LEN];
-} registrationData;
+} SP;
+
+typedef struct {
+	char SenderName[NAME_LEN];
+	char PreviousName[NAME_LEN];
+} ReplaceUsernameData;
 
 extern int numberOfUsers;
 User users[MAX_USERS];
@@ -146,7 +153,7 @@ int searchPassword(char *pass, char *name);
 SR form_sr_struct(char *senderName, char *receiverName);
 S form_s_struct(char *senderName);
 SRM form_srm_struct(char *senderName, char *receiverName, char *message);
-registrationData form_register_struct(char *senderName, char *senderPass);
+SP form_sp_struct(char *senderName, char *senderPass);
 
 #endif
 

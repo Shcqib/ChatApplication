@@ -158,7 +158,7 @@ void registerUser(void) {
 				while (1) {
 					printf("What would you like your password to be?\n");
 					if (isValidPass(myPass)) {
-						registrationData data = form_register_struct(myName, myPass);
+						SP data = form_register_struct(myName, myPass);
 						serializeMessage(RegisterUserRequest, &data);
         				printf("Welcome %s\n\n", myName);
 						updateUsersArray();

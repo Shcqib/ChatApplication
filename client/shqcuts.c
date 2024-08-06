@@ -58,10 +58,17 @@ SRM form_srm_struct(char *senderName, char *receiverName, char *message) {
 	return srm;
 }
 
-registrationData form_register_struct(char *senderName, char *senderPass) {
-	registrationData data;
+SP form_sp_struct(char *senderName, char *senderPass) {
+	SP data;
 	strcpy(data.SenderName, senderName);	
 	strcpy(data.SenderPass, senderPass);
+	return data;
+}
+
+ReplaceUsernameData form_replaceUser_struct(char *senderName, char *previousName) {
+	ReplaceUsernameData data;
+	strcpy(data.SenderName, senderName);	
+	strcpy(data.PreviousName, previousName);
 	return data;
 }
 
@@ -174,33 +181,6 @@ void replacePassword(char *name, char *pass) {
     }
 }
 
-void removeUser(char *name) {
-	FILE *file, *tempFile;
-    if  ((file = openFile(usersFilePath, "r")) == NULL) return;
-    if  ((tempFile = openFile("tempUsers.csv", "a")) == NULL) return;
-
-    int found = 0;
-    fprintf(tempFile, "username,password,status\n");
-    fscanf(file, "%*[^\n]\n");
-
-    while (fscanf(file, "%[^,],%[^,],%[^\n]\n", nameInFile, passInFile, statusInFile) != EOF) {
-        if (strcmp(nameInFile, name) == 0) {
-            found = 1;
-        } else {
-            fprintf(tempFile, "%s,%s,%s\n", nameInFile, passInFile, statusInFile);
-        }
-    }
-
-    fclose(file);
-    fclose(tempFile);
-
-    if (found) {
-        remove(usersFilePath);
-        rename("tempUsers.csv", usersFilePath);
-    } else {
-        remove("tempUsers.csv");
-    }
-}
 
 void removeMember(char *name, char *filename) {
     FILE *file, *tempFile;
@@ -233,35 +213,6 @@ void removeMember(char *name, char *filename) {
         rename("tempGroups.csv", filename);
    } else {
         remove("tempGroups.csv");
-    }
-}
-
-
-void removeFriendFromArray(char *name) {
-	FILE *file, *tempFile;
-	if  ((file = openFile("friends.csv", "r+")) == NULL) return;
-	if  ((tempFile = openFile("tempFriends.csv", "a")) == NULL) return;
-
-    int found = 0;
-	char nameOfFriend[NAME_LEN];
-
-    while (fscanf(file, "%[^\n]\n", nameOfFriend) != EOF) {
-        if (strcmp(nameOfFriend, name) == 0) {
-            found = 1;
-        } else {
-            fprintf(tempFile, "%s\n", nameOfFriend);
-        }
-    }
-	
-	fclose(file);
-    fclose(tempFile);
-
-    if (found) {
-        remove("friends.csv");
-        rename("tempFriends.csv", "friends.csv");
-		updateFriendArray(myName);	
-    } else {
-        remove("tempFriends.csv");
     }
 }
 

@@ -126,9 +126,9 @@ void deserializeMessage(unsigned char *buffer, int clientfd) {
 			break;
 		}
 		case RegisterUserRequest: {
-			registrationData *regData = (registrationData *)data;
-			addClient(regData->SenderName, clientfd);
-			registerUserRequest(regData->SenderName, regData->SenderPass, clientfd);
+			SP *sp = (registrationData *)data;
+			addClient(sp->SenderName, clientfd);
+			registerUserRequest(sp->SenderName, sp->SenderPass, clientfd);
 			break;
 		}
 		case LoginUserRequest: {
