@@ -102,11 +102,9 @@ void showFriendRequests() {
         promptUserForInput("%d", &choice);
 
         if (choice == i + 1) {
-            acceptAllFReq();
             printf("Accepted all friend requests.\n\n");
 			return;
 		} else if (choice == i + 2) {
-            removeAllFReq();
             printf("Declined all friend requests.\n\n");
 			return;
         } else if (choice == i + 3) { 

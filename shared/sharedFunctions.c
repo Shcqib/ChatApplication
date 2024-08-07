@@ -6,6 +6,16 @@
 char myName[NAME_LEN];
 bool active;
 
+char friendList[MAX_FRIENDS][NAME_LEN];
+int numberOfFriends = 0;
+char friendsArray[MAX_FRIENDS][MAX_USERS][NAME_LEN] = {{{0}}};
+int numOfFRequests = 0;
+char friendRequests[MAX_FRIENDS][NAME_LEN];
+int numLines = 0;
+char line[MAX_LINE_LENGTH];
+char headers[MAX_USERS][NAME_LEN] = {0};
+int userCount = 0;
+
 int typeCount = 0;
 
 FILE *openFile(char *filename, char *format) {
