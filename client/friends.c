@@ -142,8 +142,9 @@ void messageFriend(void) {
 							break;	
 						}
 					}
-					snprintf(messageToSend, sizeof(messageToSend), "MESSAGE %s %s %s", myName, nameOfFriend, message);
-					sendMessage(messageToSend);
+
+					SRM data = form_srm_struct(myName, nameOfFriend, message);
+					serializeMessage(SendMessageRequest, &data);
 					return;
 				}
 			}	
@@ -161,6 +162,8 @@ void removeFriend(void) {
 			int found = 0;
 			for (int i = 0; i < numberOfFriends; i++) {
 				if (strcmp(nameOfFriend, friendList[i]) == 0) {
+					SR data = form_sr_struct(myName, nameOfFriend);
+					serializeMessage(RemoveFriend, &data);
 					printf("%s is no longer your friend.\n\n", nameOfFriend);
 					return;
 				}

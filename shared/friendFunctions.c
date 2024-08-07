@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <string.h>
 #include "shqcuts.h"
+#include "serverFunctions.h"
 #include <stdbool.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -257,4 +258,58 @@ void updateFriendArray(char *name) {
             strncpy(friendList[numberOfFriends++], friendsArray[i][myIndex], NAME_LEN);
         }
     }
+}
+
+void sendFriendRequest(char *name, char *recipientName, int clientfd) {
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+
+        if (strcmp(recipientName, clients[i].username) == 0) {
+
+            snprintf(messageToSend, sizeof(messageToSend), "You have sent %s a friend request.", recipientName);
+            sendClientMessage(messageToSend, clientfd);
+            snprintf(messageToSend, sizeof(messageToSend), "%s sent you a friend request.", name);
+            sendClientMessage(messageToSend, clients[i].clientfd);
+            writeFriendToFile("data/friendReq.csv", recipientName, name);
+            return;
+        }
+
+    }
+}
+
+void acceptFriendRequest(char *name, char *recipientName, int clientfd) {
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        if (strcmp(recipientName, clients[i].username) == 0) {
+            snprintf(messageToSend, sizeof(messageToSend), "You and %s are now friends.\n\n", name);
+            sendClientMessage(messageToSend, clients[i].clientfd);
+            acceptFReq(recipientName, name);
+            break;
+        }
+    }
+
+
+    snprintf(messageToSend, sizeof(messageToSend), "You and %s are now friends.\n\n", recipientName);
+    sendClientMessage(messageToSend, clientfd);
+    acceptFReq(name, recipientName);
+}
+
+
+void removeFriendRequest(char *name, char *recipientName, int clientfd) {
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        if (strcmp(recipientName, clients[i].username) == 0) {
+            snprintf(messageToSend, sizeof(messageToSend), "%s declined your friend request.\n\n", name);
+            sendClientMessage(messageToSend, clients[i].clientfd);
+            break;
+        }
+    }
+            snprintf(messageToSend, sizeof(messageToSend), "You declined %s friend request.\n\n", recipientName);
+            sendClientMessage(messageToSend, clientfd);
+            removeFReq(name, recipientName);
+}
+
+void sendFriendMessage(char *name, char *recipientName, char *message, int clientfd) {
+
+}
+
+void removeFriend(char *name, char *recipientName, int clientfd) {
+
 }

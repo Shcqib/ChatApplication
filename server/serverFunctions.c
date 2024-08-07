@@ -52,52 +52,6 @@ void sendClientMessage(char *buffer, int clientfd) {
     }
 }
 
-void sendFriendRequest(char *name, char *recipientName, int clientfd) {
-	for (int i = 0; i < MAX_CLIENTS; i++) {                                                                                  
-		if (strcmp(recipientName, clients[i].username) == 0) {                                                              
-			snprintf(messageToSend, sizeof(messageToSend), "You have sent %s a friend request.", recipientName);
-			sendClientMessage(messageToSend, clientfd);
-			snprintf(messageToSend, sizeof(messageToSend), "%s sent you a friend request.", name);
-			sendClientMessage(messageToSend, clients[i].clientfd);
-			writeFriendToFile("data/friendReq.csv", recipientName, name);
-			return;
-		}                                                                                                                     
-    }  
-}
-
-void acceptFriendRequest(char *name, char *recipientName, int clientfd) {
-	for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (strcmp(recipientName, clients[i].username) == 0) {
-			snprintf(messageToSend, sizeof(messageToSend), "You and %s are now friends.\n\n", name);
-			sendClientMessage(messageToSend, clients[i].clientfd);
-			acceptFReq(recipientName, name);
-			break;
-        }
-    }
-
-
-	snprintf(messageToSend, sizeof(messageToSend), "You and %s are now friends.\n\n", recipientName);
-	sendClientMessage(messageToSend, clientfd);
-	acceptFReq(name, recipientName);
-}
-
-
-void removeFriendRequest(char *name, char *recipientName, int clientfd) {
-	for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (strcmp(recipientName, clients[i].username) == 0) {
-			snprintf(messageToSend, sizeof(messageToSend), "%s declined your friend request.\n\n", name);
-			sendClientMessage(messageToSend, clients[i].clientfd);
-			break;
-        }
-    }
-			snprintf(messageToSend, sizeof(messageToSend), "You declined %s friend request.\n\n", recipientName);
-			sendClientMessage(messageToSend, clientfd);
-			removeFReq(name, recipientName);
-}
-
-void sendFriendMessage(char *buffer, int clientfd) {
-}
-
 void clientDisconnection(char *name, int clientfd) {
 	active = false;
 	updateStatus(name, active);
@@ -153,6 +107,8 @@ void deserializeMessage(unsigned char *buffer, int clientfd) {
 			break;
 		}
 		case RemoveFriend: {
+			SR *sr = (SR *)data;
+			removeFriend(sr->SenderName, sr->ReceiverName, clientfd);
 			break;
 		}
 		case DeactivateAccountRequest: {
@@ -161,6 +117,8 @@ void deserializeMessage(unsigned char *buffer, int clientfd) {
 			break;
 		}
         case SendMessageRequest: {
+			SRM *srm = (SRM *)data;
+			sendFriendMessage(srm->SenderName, srm->ReceiverName, srm->Message, clientfd);
             break;
         }
         default:
