@@ -162,7 +162,6 @@ void removeFriend(void) {
 				if (strcmp(nameOfFriend, friendList[i]) == 0) {
 					SR data = form_sr_struct(myName, nameOfFriend);
 					serializeMessage(RemoveFriend, &data);
-					printf("%s is no longer your friend.\n\n", nameOfFriend);
 					return;
 				}
 			}
@@ -194,9 +193,7 @@ void addFriend(void) {
 				bool userExists = false;
 			 	for (int i = 0; i < numberOfUsers; i++) {
                     if (strcmp(users[i].username, nameOfFriend) == 0) {
-						SR data;
-						strcpy(data.SenderName, myName);
-						strcpy(data.ReceiverName, nameOfFriend);
+						SR data = form_sr_struct(myName, nameOfFriend);
 						serializeMessage(SendFriendRequest, &data);
 						userExists = true;
                         return;

@@ -9,17 +9,16 @@
 
 char nameInFile[NAME_LEN], passInFile[NAME_LEN], statusInFile[NAME_LEN];
 
-void registerUserRequest(char *name, char *pass, int clientfd) {
+void registerUserRequest(char *name, char *pass) {
 	snprintf(messageToSend , sizeof(messageToSend), "Welcome %s", name);
-	sendClientMessage(messageToSend, clientfd);
+	sendClientMessage(messageToSend, name);
 	active = true;
 	writeUserToFile(usersFilePath, name, pass, active);
 }
 
-void loginUserRequest(char *name, int clientfd) {
-	printf("calling loginUserRequest\n");
+void loginUserRequest(char *name) {
 	snprintf(messageToSend , sizeof(messageToSend), "Welcome %s", name);
-	sendClientMessage(messageToSend, clientfd);
+	sendClientMessage(messageToSend, name);
 	active = true;
 	updateStatus(name, active);
 }

@@ -41,18 +41,15 @@ void addClient(char *username, int clientfd) {
 	}
 }
 
-void sendClientMessage(char *buffer, int clientfd) {
-    int bytes_sent = send(clientfd, buffer, strlen(buffer) + 1, 0);
-	if (bytes_sent < 0) {
-        perror("send failed");
-    } else if (bytes_sent == 0) {
-        printf("Sending 0 bytes\n");
-    } else {
-        printf("Sent %d bytes: %s\n", bytes_sent, buffer);
-    }
+void sendClientMessage(char *buffer, char *name) {
+	for (int i = 0; i < MAX_CLIENTS; i++) {
+		if (strcmp(name, clients[i].username) == 0) {
+			send(clients[i].clientfd, buffer, strlen(buffer) + 1, 0);
+		} 
+	}
 }
 
-void clientDisconnection(char *name, int clientfd) {
+void clientDisconnection(char *name) {
 	active = false;
 	updateStatus(name, active);
 }
@@ -66,34 +63,34 @@ void deserializeMessage(unsigned char *buffer, int clientfd) {
     switch (type) {
         case SendFriendRequest: {
 			SR *sr = (SR *)data;
-			sendFriendRequest(sr->SenderName, sr->ReceiverName, clientfd);	
+			sendFriendRequest(sr->SenderName, sr->ReceiverName);	
             break;
         }
 		case AddFriendRequest: {
 			SR *sr = (SR *)data;
-			acceptFriendRequest(sr->SenderName, sr->ReceiverName, clientfd);	
+			acceptFriendRequest(sr->SenderName, sr->ReceiverName);	
 			break;
 		}
 		case RemoveFriendRequest: {
 			SR *sr = (SR *)data;
-			removeFriendRequest(sr->SenderName, sr->ReceiverName, clientfd);	
+			removeFriendRequest(sr->SenderName, sr->ReceiverName);	
 			break;
 		}
 		case RegisterUserRequest: {
 			SP *sp = (SP *)data;
 			addClient(sp->SenderName, clientfd);
-			registerUserRequest(sp->SenderName, sp->SenderPass, clientfd);
+			registerUserRequest(sp->SenderName, sp->SenderPass);
 			break;
 		}
 		case LoginUserRequest: {
 			S *s = (S *)data;
 			addClient(s->SenderName, clientfd);
-			loginUserRequest(s->SenderName, clientfd);
+			loginUserRequest(s->SenderName);
 			break;
 		}
 		case ClientDisconnect: {
 			S *s = (S *)data;
-			clientDisconnection(s->SenderName, clientfd);
+			clientDisconnection(s->SenderName);
 			break;
 		}
 		case ReplaceUsernameRequest: {
@@ -108,7 +105,7 @@ void deserializeMessage(unsigned char *buffer, int clientfd) {
 		}
 		case RemoveFriend: {
 			SR *sr = (SR *)data;
-			removeFriend(sr->SenderName, sr->ReceiverName, clientfd);
+			removeFriend(sr->SenderName, sr->ReceiverName);
 			break;
 		}
 		case DeactivateAccountRequest: {
@@ -118,7 +115,7 @@ void deserializeMessage(unsigned char *buffer, int clientfd) {
 		}
         case SendMessageRequest: {
 			SRM *srm = (SRM *)data;
-			sendFriendMessage(srm->SenderName, srm->ReceiverName, srm->Message, clientfd);
+			sendFriendMessage(srm->SenderName, srm->ReceiverName, srm->Message);
             break;
         }
         default:

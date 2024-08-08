@@ -5,17 +5,16 @@
 
 #define MAX_CLIENTS 5
 
-void sendFriendMessage(char *name, char *recipientName, char *message, int clientfd);
-void removeFriend(char *name, char *recipientName, int clientfd);
-void acceptFriendRequest(char *name, char *recipientName, int clientfd);
-void sendFriendRequest(char *name, char *recipientName, int clientfd);
-void removeFriendRequest(char *name, char *recipientName, int clientfd);
-void sendClientMessage(char *buffer, int clientfd);
-void loginUserRequest(char *name, int clientfd);
-void registerUserRequest(char *name, char *pass, int clientfd);
+void sendFriendMessage(char *name, char *recipientName, char *message);
+void removeFriend(char *name, char *recipientName);
+void acceptFriendRequest(char *name, char *recipientName);
+void sendFriendRequest(char *name, char *recipientName);
+void removeFriendRequest(char *name, char *recipientName);
+void loginUserRequest(char *name);
+void registerUserRequest(char *name, char *pass);
 void addClient(char *username, int clientfd);
 void handleCommand(unsigned char *buffer, int clientfd);
-void sendClientMessage(char *buffer, int clientfd);
+void sendClientMessage(char *buffer, char *name);
 
 char  messageToSend[MSG_LEN];
 

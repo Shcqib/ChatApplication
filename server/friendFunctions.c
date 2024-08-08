@@ -95,6 +95,55 @@ void writeFriendToFile(char *filename, char *username, char *friendName) {
 	fclose(file);
 }
 
+void removeFriend(char *name, char *recipientName) {
+	snprintf(messageToSend, sizeof(messageToSend), "You removed %s as a friend.", recipientName);
+	sendClientMessage(messageToSend, name);
+	removeFriendFromFile(recipientName, name, clientfd);
+
+	snprintf(messageToSend, sizeof(messageToSend), "%s removed you as a friend.", name);
+	sendClientMessage(messageToSend, recipientName);
+	removeFriendFromFile(name, recipientName, clientfd);
+}
+
+void removeFriendFromFile(char *name, char *recipientName) {
+	int userIndex = updateFile(friendsFilePath, name);
+
+	for (int i = 0; i < MAX_FRIENDS; i++) {
+		if (strcmp(recipientName, friendsArray[i][userIndex]) == 0) {
+			friendsArray[i][userIndex][0] = '\0';
+		}
+    }
+
+	FILE *file;
+    if ((file = openFile(friendsFilePath, "w")) == NULL) return;
+
+    for (int i = 0; i < userCount; i++) {
+        fprintf(file, "%s", headers[i]);
+        if (i < userCount - 1) fprintf(file, ",");
+    }
+    fprintf(file, "\n");
+
+    for (int i = 0; i < MAX_FRIENDS; i++) {
+        bool isEmptyLine = true;
+        for (int j = 0; j < userCount; j++) {
+            if (strlen(friendsArray[i][j]) > 0) {
+                isEmptyLine = false;
+                break;
+            }
+        }
+
+        if (!isEmptyLine) {
+            for (int j = 0; j < userCount; j++) {
+                fprintf(file, "%s", friendsArray[i][j]);
+                if (j < userCount - 1) fprintf(file, ",");
+            }
+            fprintf(file, "\n");
+        }
+    }
+
+    fclose(file);
+}
+
 void acceptAllFReq() {
 	int userIndex = updateFile(friendReqFilePath, myName);
 
@@ -154,55 +203,37 @@ void removeAllFReq() {
 		removeFReq("p", friendsArray[i][userIndex]);
     }
 }
-    for (int i = 0; i < MAX_CLIENTS; i++) {
 
-        if (strcmp(recipientName, clients[i].username) == 0) {
+void sendFriendRequest(char *name, char *recipientName) {
+	snprintf(messageToSend, sizeof(messageToSend), "You have sent %s a friend request.", recipientName);
+	sendClientMessage(messageToSend, name);
 
-            snprintf(messageToSend, sizeof(messageToSend), "You have sent %s a friend request.", recipientName);
-            sendClientMessage(messageToSend, clientfd);
-            snprintf(messageToSend, sizeof(messageToSend), "%s sent you a friend request.", name);
-            sendClientMessage(messageToSend, clients[i].clientfd);
-            writeFriendToFile("data/friendReq.csv", recipientName, name);
-            return;
-        }
-
-    }
+	snprintf(messageToSend, sizeof(messageToSend), "%s sent you a friend request.", name);
+	sendClientMessage(messageToSend, recipientName);
+	writeFriendToFile(friendReqFilePath, recipientName, name);
 }
 
-void acceptFriendRequest(char *name, char *recipientName, int clientfd) {
-    for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (strcmp(recipientName, clients[i].username) == 0) {
-            snprintf(messageToSend, sizeof(messageToSend), "You and %s are now friends.\n\n", name);
-            sendClientMessage(messageToSend, clients[i].clientfd);
-            acceptFReq(recipientName, name);
-            break;
-        }
-    }
+void acceptFriendRequest(char *name, char *recipientName) {
+	snprintf(messageToSend, sizeof(messageToSend), "You and %s are now friends.", name);
+	sendClientMessage(messageToSend, recipientName);
+	acceptFReq(recipientName, name);
 
-
-    snprintf(messageToSend, sizeof(messageToSend), "You and %s are now friends.\n\n", recipientName);
-    sendClientMessage(messageToSend, clientfd);
+    snprintf(messageToSend, sizeof(messageToSend), "You and %s are now friends.", recipientName);
+    sendClientMessage(messageToSend, name);
     acceptFReq(name, recipientName);
 }
 
 
-void removeFriendRequest(char *name, char *recipientName, int clientfd) {
-    for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (strcmp(recipientName, clients[i].username) == 0) {
-            snprintf(messageToSend, sizeof(messageToSend), "%s declined your friend request.\n\n", name);
-            sendClientMessage(messageToSend, clients[i].clientfd);
-            break;
-        }
-    }
-            snprintf(messageToSend, sizeof(messageToSend), "You declined %s friend request.\n\n", recipientName);
-            sendClientMessage(messageToSend, clientfd);
-            removeFReq(name, recipientName);
+void removeFriendRequest(char *name, char *recipientName) {
+	snprintf(messageToSend, sizeof(messageToSend), "%s declined your friend request.", name);
+	sendClientMessage(messageToSend, recipientName);
+
+	snprintf(messageToSend, sizeof(messageToSend), "You declined %s friend request.", recipientName);
+	sendClientMessage(messageToSend, name);
+	removeFReq(name, recipientName);
 }
 
-void sendFriendMessage(char *name, char *recipientName, char *message, int clientfd) {
+void sendFriendMessage(char *name, char *recipientName, char *message) {
 
 }
 
-void removeFriend(char *name, char *recipientName, int clientfd) {
-
-}
