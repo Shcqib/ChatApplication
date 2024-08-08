@@ -115,6 +115,7 @@ void deserializeMessage(unsigned char *buffer, int clientfd) {
 		}
         case SendMessageRequest: {
 			SRM *srm = (SRM *)data;
+			printf("MESSAGE = %s\n", srm->Message);
 			sendFriendMessage(srm->SenderName, srm->ReceiverName, srm->Message);
             break;
         }

@@ -10,6 +10,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
+void removeFriendFromFile(char *name, char *recipientName);
 void removeFReq(char *name, char *friendName);
 void clearArrays();
 
@@ -98,11 +99,11 @@ void writeFriendToFile(char *filename, char *username, char *friendName) {
 void removeFriend(char *name, char *recipientName) {
 	snprintf(messageToSend, sizeof(messageToSend), "You removed %s as a friend.", recipientName);
 	sendClientMessage(messageToSend, name);
-	removeFriendFromFile(recipientName, name, clientfd);
+	removeFriendFromFile(recipientName, name);
 
 	snprintf(messageToSend, sizeof(messageToSend), "%s removed you as a friend.", name);
 	sendClientMessage(messageToSend, recipientName);
-	removeFriendFromFile(name, recipientName, clientfd);
+	removeFriendFromFile(name, recipientName);
 }
 
 void removeFriendFromFile(char *name, char *recipientName) {
@@ -234,6 +235,10 @@ void removeFriendRequest(char *name, char *recipientName) {
 }
 
 void sendFriendMessage(char *name, char *recipientName, char *message) {
+	snprintf(messageToSend, sizeof(messageToSend), "You -> %s : %s", recipientName, message);
+	sendClientMessage(messageToSend, name);
 
+	snprintf(messageToSend, sizeof(messageToSend), "%s -> You : %s", name, message);
+	sendClientMessage(messageToSend, recipientName);
 }
 

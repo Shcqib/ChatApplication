@@ -119,7 +119,6 @@ void showFriendRequests() {
 
 void messageFriend(void) {
 	int lenOfMsg = 0;
-	char messageToSend[256];
 
 	while (1) {
 		printf("Type the name of the friend you would like to message\n");
