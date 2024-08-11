@@ -5,6 +5,7 @@
 
 #define dataPath "data/"                                                                                  
 #define usersFilePath dataPath "users.csv" 
+#define groupFilePath dataPath "groups.csv"
 #define friendsFilePath dataPath "friends.csv" 
 #define friendReqFilePath dataPath "friendReq.csv"
 
@@ -19,7 +20,7 @@
 #define NAME_LEN 20
 #define BUFFER_SIZE 1024
 
-void writeGroupToFile(char *groupName);
+void writeGroupToFile(char *groupName, char *name);
 void updateStatus(char *name, bool status);
 int main(void);
 void initializeGroupFile(char *username);
@@ -60,6 +61,8 @@ void promptUserForInput(const char *type, void *input);
 int friends(void);
 int groupsMenu(void);
 void settingsMenu(void);
+void updateGroupMemberFile(int userIndex);
+int updateGroupFile(char *username);
 
 extern char friendsArray[MAX_FRIENDS][MAX_USERS][NAME_LEN];
 extern int lenOfMsg; 
@@ -77,6 +80,8 @@ extern bool active;
 extern int numberOfGroups;
 extern char line[MAX_LINE_LENGTH];
 extern char friendRequests[MAX_FRIENDS][NAME_LEN];
+extern char groupsArray[MAX_GROUPS][MAX_USERS][NAME_LEN];
+extern char membersArray[MAX_MEMBERS][MAX_GROUPS][NAME_LEN];
 extern int numOfFRequests;
 extern int userCount;
 extern int numLines;
@@ -95,6 +100,7 @@ typedef enum {
 	ReplacePasswordRequest = 10,
 	DeactivateAccountRequest = 11,
 	RemoveFriend = 12,
+	CreateGroupRequest = 13,
 } MessageType;
 
 typedef struct {
@@ -143,6 +149,11 @@ typedef struct {
 	char SenderName[NAME_LEN];
 	char SenderPass[NAME_LEN];
 } SP;
+
+typedef struct {
+	char SenderName[NAME_LEN];
+	char GroupName[NAME_LEN];
+} SG;
 
 typedef struct {
 	char SenderName[NAME_LEN];

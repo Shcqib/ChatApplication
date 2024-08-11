@@ -10,6 +10,7 @@ void removeFriend(char *name, char *recipientName);
 void acceptFriendRequest(char *name, char *recipientName);
 void sendFriendRequest(char *name, char *recipientName);
 void removeFriendRequest(char *name, char *recipientName);
+void createGroup(char *name, char *nameOfGroup);
 void loginUserRequest(char *name);
 void registerUserRequest(char *name, char *pass);
 void addClient(char *username, int clientfd);

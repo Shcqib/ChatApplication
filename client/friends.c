@@ -18,6 +18,8 @@ char message[MSG_LEN];
 int friends(void) {
 
     while (1) {
+		updateFriendArray(myName);
+
         printf("1) See all friends\n");
         printf("2) Add a friend\n");
         printf("3) Remove a friend\n");
@@ -54,6 +56,8 @@ int friends(void) {
 }
 
 void fReqMenu(char *friendName) {
+	updateFReq(myName);
+
 	while (true) {
 		printf("1) Accept friend request.\n");
 		printf("2) Decline friend request.\n");
@@ -141,6 +145,7 @@ void messageFriend(void) {
 					}
 
 					SRM data = form_srm_struct(myName, nameOfFriend, message);
+					printf("message = %s", data.Message);
 					serializeMessage(SendMessageRequest, &data);
 					return;
 				}
@@ -189,6 +194,15 @@ void addFriend(void) {
 					}
 				}
 
+				int userIndex = updateFile(friendReqFilePath, myName);
+
+				for (int i = 0; i < numberOfFriends; i++) {
+					if (strcmp(friendsArray[i][userIndex], nameOfFriend) == 0) {
+						printf("You have already sent this person a friend request.\n\n");
+						return;
+					}
+				}
+
 				bool userExists = false;
 			 	for (int i = 0; i < numberOfUsers; i++) {
                     if (strcmp(users[i].username, nameOfFriend) == 0) {
@@ -211,8 +225,6 @@ void addFriend(void) {
 }
 
 void showFriendList(void) {
-	updateFriendArray(myName);
-
 	if (numberOfFriends == 0) {
 		printf ("You have no friends.\n\n");
 	}

@@ -9,7 +9,6 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-char line[MAX_LINE_LENGTH];
 char groupsArray[MAX_GROUPS][MAX_USERS][NAME_LEN] = {{{0}}};
 char membersArray[MAX_MEMBERS][MAX_GROUPS][NAME_LEN] = {{{0}}};
 int numOfMembers = 0;
@@ -39,7 +38,7 @@ void updateGroupMemberFile(int userIndex) {
 	for (int i = 0; i < numLines; i++) {
 		char filename[256];
 		FILE *file;
-		snprintf(filename, sizeof(filename), "%s_members.csv", groupsArray[i][userIndex]);
+		snprintf(filename, sizeof(filename), "data/%s_members.csv", groupsArray[i][userIndex]);
 		if ((file = openFile(filename, "r")) == NULL) return;
 
 		while (fgets(line, sizeof(line), file)) {
@@ -75,7 +74,7 @@ void updateGroupMemberFile(int userIndex) {
 int updateGroupFile(char *username) {
 	printf("updating group file\n");
     FILE *file, memberFile;
-    if ((file = openFile("groups.csv", "r")) == NULL) return -1;
+    if ((file = openFile(groupFilePath, "r")) == NULL) return -1;
 
 	clearVariables();
 
@@ -250,56 +249,4 @@ void updateGroups() {
 			}
 		}
 	}
-}
-
-void writeGroupMemberToFile(char *groupName, char *name) {
-	char filename[256];
-
-	FILE *file;
-	snprintf(filename, sizeof(filename), "%s_members.csv", groupName);
-	printf("creating file with name %s\n", groupName);
-	if ((file = openFile(filename, "a+")) == NULL) return;
-
-	fprintf(file, "%s\n", name);
-	fclose(file);
-}
-
-void writeGroupToFile(char *groupName) {
-	int userIndex = updateGroupFile(myName);
-
-	for (int i = 0; i < MAX_FRIENDS; i++) {
-        if (strlen(groupsArray[i][userIndex]) == 0) {
-            strcpy(groupsArray[i][userIndex], groupName);
-            break;
-        }
-    }
-
-	FILE *file;
-    if ((file = openFile("groups.csv", "w")) == NULL) return;
-
-    for (int i = 0; i < userCount; i++) {
-        fprintf(file, "%s", headers[i]);
-        if (i < userCount - 1) fprintf(file, ",");
-    }
-    fprintf(file, "\n");
-
-    for (int i = 0; i < MAX_FRIENDS; i++) {
-        bool isEmptyLine = true;
-        for (int j = 0; j < userCount; j++) {
-            if (strlen(groupsArray[i][j]) > 0) {
-                isEmptyLine = false;
-                break;
-            }
-        }
-
-        if (!isEmptyLine) {
-            for (int j = 0; j < userCount; j++) {
-                fprintf(file, "%s", groupsArray[i][j]);
-                if (j < userCount - 1) fprintf(file, ",");
-            }
-            fprintf(file, "\n");
-        }
-    }
-
-    fclose(file);
 }

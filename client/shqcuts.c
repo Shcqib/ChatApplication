@@ -54,7 +54,7 @@ SRM form_srm_struct(char *senderName, char *receiverName, char *message) {
 	SRM srm;
 	strcpy(srm.SenderName, senderName);	
 	strcpy(srm.ReceiverName, receiverName);
-	strcpy(srm.Message, message);
+	strncpy(srm.Message, message, MSG_LEN);
 	return srm;
 }
 
@@ -85,6 +85,7 @@ void serializeMessage(MessageType reqType, void *data) {
         if (reqType == typeRegistry[i].typeIndex) {                                                       
             buffer[0] = (unsigned char)typeRegistry[i].typeIndex;                                         
             buffer[1] = (unsigned char)typeRegistry[i].size;                                              
+			printf("dataSize = %hhu\n", (unsigned char)typeRegistry[i].size);
             memcpy(buffer + 2, data, typeRegistry[i].size);                                               
                                                                                                           
             send(sockfd, buffer, typeRegistry[i].size + 2, 0);                                            

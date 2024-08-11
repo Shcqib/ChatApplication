@@ -49,4 +49,5 @@ void registerAllTypes() {
 	registerType(ReplacePasswordRequest, sizeof(SP));
 	registerType(DeactivateAccountRequest, sizeof(S));
 	registerType(RemoveFriend, sizeof(SR));
+	registerType(CreateGroupRequest, sizeof(SG));
 }

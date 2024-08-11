@@ -57,6 +57,7 @@ void clientDisconnection(char *name) {
 void deserializeMessage(unsigned char *buffer, int clientfd) {
     MessageType type = buffer[0];
 	size_t dataSize = (size_t)buffer[1];
+	printf("dataSize = %zu\n", dataSize);
     void *data = malloc(dataSize);
 	memcpy(data, buffer + 2, dataSize);
 
@@ -119,6 +120,11 @@ void deserializeMessage(unsigned char *buffer, int clientfd) {
 			sendFriendMessage(srm->SenderName, srm->ReceiverName, srm->Message);
             break;
         }
+		case CreateGroupRequest: {
+			SG *sg = (SG *)data;
+			createGroup(sg->SenderName, sg->GroupName);
+			break;
+		}
         default:
             printf("Unknown message type\n");
             break;
