@@ -83,7 +83,7 @@ void createGroup() {
 		char nameOfGroup[NAME_LEN];
    		printf("What would you like to call your group?\n");
 		if (isValidName(nameOfGroup)) {
-			SR data = form_sr_struct(myName, nameOfGroup);
+			SG data = form_sg_struct(myName, nameOfGroup);
 			serializeMessage(CreateGroupRequest, &data);
 			updateGroups();
 			printf("You have successfully created the group %s.\n\n", nameOfGroup);
@@ -112,10 +112,8 @@ void addToGroup(Group *currentGroup) {
 
 			for (int i = 0; i < numberOfUsers; i++) {
 				if (strcmp(nameOfFriend, users[i].username) == 0) {
-					char filename[NAME_LEN];
-					snprintf(filename, sizeof(filename), "%sMembers.csv", currentGroup->groupName);
-					updateGroups();
-					printf("Added %s to the group.\n\n", nameOfFriend);
+					SRG data = form_srg_struct(myName, nameOfFriend, currentGroup->groupName);
+					serializeMessage(AddToGroupRequest, &data);
 					groupMenu(currentGroup);
 					return;
 				}

@@ -23,7 +23,6 @@
 void writeGroupToFile(char *groupName, char *name);
 void updateStatus(char *name, bool status);
 int main(void);
-void initializeGroupFile(char *username);
 void initializeFile(char *filename, const char *username);
 FILE *openFile(char *filename, char *format);
 void writeFriendToFile(char *filename, char *username, char *friendName);
@@ -101,6 +100,7 @@ typedef enum {
 	DeactivateAccountRequest = 11,
 	RemoveFriend = 12,
 	CreateGroupRequest = 13,
+	AddToGroupRequest = 14,
 } MessageType;
 
 typedef struct {
@@ -157,6 +157,12 @@ typedef struct {
 
 typedef struct {
 	char SenderName[NAME_LEN];
+	char ReceiverName[NAME_LEN];
+	char GroupName[NAME_LEN];
+} SRG;
+
+typedef struct {
+	char SenderName[NAME_LEN];
 	char PreviousName[NAME_LEN];
 } ReplaceUsernameData;
 
@@ -169,6 +175,8 @@ int searchPassword(char *pass, char *name);
 SR form_sr_struct(char *senderName, char *receiverName);
 S form_s_struct(char *senderName);
 SRM form_srm_struct(char *senderName, char *receiverName, char *message);
+SG form_sg_struct(char *senderName, char *groupName);
+SRG form_srg_struct(char *senderName, char *receiverName, char *groupName);
 SP form_sp_struct(char *senderName, char *senderPass);
 ReplaceUsernameData form_replaceUser_struct(char *senderName, char *previousName);
 

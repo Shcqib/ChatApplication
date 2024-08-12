@@ -58,6 +58,21 @@ SRM form_srm_struct(char *senderName, char *receiverName, char *message) {
 	return srm;
 }
 
+SG form_sg_struct(char *senderName, char *groupName) {
+    SG sg;
+    strcpy(sg.SenderName, senderName);
+    strcpy(sg.GroupName, groupName);
+    return sg;
+}
+
+SRG form_srg_struct(char *senderName, char *receiverName, char *groupName) {
+    SRG srg;
+    strcpy(srg.SenderName, senderName);
+    strcpy(srg.ReceiverName, receiverName);
+    strcpy(srg.GroupName, groupName);
+    return srg;
+}
+
 SP form_sp_struct(char *senderName, char *senderPass) {
 	SP data;
 	strcpy(data.SenderName, senderName);	

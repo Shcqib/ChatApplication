@@ -50,4 +50,5 @@ void registerAllTypes() {
 	registerType(DeactivateAccountRequest, sizeof(S));
 	registerType(RemoveFriend, sizeof(SR));
 	registerType(CreateGroupRequest, sizeof(SG));
+	registerType(AddToGroupRequest, sizeof(SRG));
 }

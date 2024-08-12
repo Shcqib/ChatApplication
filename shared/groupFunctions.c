@@ -120,48 +120,6 @@ int updateGroupFile(char *username) {
     return 0;
 }
 
-void initializeGroupFile(char *username) {
-	int userIndex = updateGroupFile(username);
-	printf("initializing groupfile\n");
-
-	for (int i = 0; i < userCount; i++) {
-        if (strcmp(headers[i], username) == 0) {
-            return;
-        }
-    }
-
-    strcpy(headers[userCount++], username);
-
-	FILE *file;
-    if ((file = openFile("groups.csv", "w")) == NULL) return;
-
-    for (int i = 0; i < userCount; i++) {
-        fprintf(file, "%s", headers[i]);
-        if (i < userCount - 1) fprintf(file, ",");
-    }
-    printf("\n");
-
-	for (int i = 0; i < numLines; i++) {
-		int isEmptyLine = true;
-		for (int j = 0; j < userCount; j++) {
-			if (strlen(groupsArray[i][j]) > 0) {
-				isEmptyLine = false;
-				break;
-			}
-		}
-		if (!isEmptyLine) {
-			for (int j = 0; j < userCount; j++) {
-				fprintf(file, "%s", groupsArray[i][j]);
-				if (j < userCount - 1) fprintf(file, ",");
-			}
-			fprintf(file, "\n");
-		}
-	}
-
-	printf("initialized group file\n");
-    fclose(file);
-}
-
 void updateGroupArray(char *filename) {
     FILE *file;
     if ((file = openFile(filename, "r")) == NULL) return;
